@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASPT 스틱포 롤 불량 이슈 리포트</title>
+    <title>ASPT 스틱포 롤지 불량 이력</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -20,10 +20,10 @@
             margin-bottom: 24px;
         }
         .header h1 { font-size: 22px; margin-bottom: 6px; }
-        .header p { opacity: 0.6; font-size: 14px; }
+        .header p { opacity: 0.6; font-size: 14px; margin-top: 4px; }
         .stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             margin-bottom: 24px;
         }
@@ -34,7 +34,7 @@
             text-align: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-        .stat .num { font-size: 40px; font-weight: bold; color: #1a1a2e; }
+        .stat .num { font-size: 36px; font-weight: bold; color: #1a1a2e; }
         .stat .lbl { font-size: 13px; color: #888; margin-top: 4px; }
         .card {
             background: white;
@@ -43,32 +43,97 @@
             margin-bottom: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-        .card h2 { font-size: 16px; margin-bottom: 12px; color: #1a1a2e; }
-        .card h3 { font-size: 15px; margin-bottom: 14px; color: #1a1a2e; }
-        .card p { font-size: 14px; line-height: 1.7; color: #555; }
-        .count-badge {
-            background: #e8eaf6;
-            color: #1a1a2e;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 13px;
-            margin-left: 8px;
+        .card h2 { font-size: 16px; margin-bottom: 14px; color: #1a1a2e; border-left: 4px solid #1a1a2e; padding-left: 10px; }
+        .card p { font-size: 14px; line-height: 1.8; color: #555; }
+        .badge {
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            white-space: nowrap;
         }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th {
             text-align: left;
             padding: 8px 12px;
             background: #f7f7f7;
             color: #666;
             font-weight: normal;
+            white-space: nowrap;
         }
-        td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
+        td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
         tr:last-child td { border-bottom: none; }
-        .badge {
-            color: white;
-            padding: 2px 8px;
+        .section-header {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 28px 0 12px;
+            color: #1a1a2e;
+        }
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .type-card {
+            background: white;
             border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .type-card .type-name { font-size: 14px; font-weight: bold; color: #1a1a2e; margin-bottom: 6px; }
+        .type-card .type-count { font-size: 28px; font-weight: bold; color: #e74c3c; }
+        .type-card .type-desc { font-size: 12px; color: #888; margin-top: 6px; line-height: 1.6; }
+        .timeline-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 88px;
+            top: 28px;
+            bottom: -8px;
+            width: 2px;
+            background: #eee;
+        }
+        .timeline-date {
+            flex-shrink: 0;
+            width: 100px;
             font-size: 12px;
+            color: #888;
+            padding-top: 4px;
+            text-align: right;
+        }
+        .timeline-dot {
+            flex-shrink: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-top: 6px;
+            z-index: 1;
+        }
+        .timeline-content { flex: 1; }
+        .timeline-content .title { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 3px; }
+        .timeline-content .detail { font-size: 13px; color: #666; line-height: 1.6; }
+        .alert-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        .alert-box.red {
+            background: #fee;
+            border-left-color: #e74c3c;
+        }
+        .alert-box.green {
+            background: #e8f5e9;
+            border-left-color: #27ae60;
         }
         .footer {
             text-align: center;
@@ -76,1258 +141,328 @@
             font-size: 12px;
             margin-top: 24px;
         }
+        @media (max-width: 768px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .type-grid { grid-template-columns: repeat(2, 1fr); }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>ASPT 스틱포 롤 불량 이슈 리포트</h1>
-        <p>검색 기간: 2025-01-01 ~ 2026-03-04 &nbsp;|&nbsp; 채널: #제1원외탕전_트러블슈팅  /  #제2원외탕전_트러블슈팅</p>
+
+<div class="header">
+    <h1>ASPT 스틱포 롤지 불량 이력</h1>
+    <p>공급업체: ASPT &nbsp;|&nbsp; 검색 기간: 2025-01-01 ~ 2026-03-04 &nbsp;|&nbsp; 채널: #제1원외탕전_트러블슈팅 / #제2원외탕전_트러블슈팅</p>
+    <p>기준일: 2026-03-04 &nbsp;|&nbsp; 수집 메시지: 234건 (양 채널 합산)</p>
+</div>
+
+<div class="stats">
+    <div class="stat">
+        <div class="num">234</div>
+        <div class="lbl">수집 메시지 수</div>
     </div>
+    <div class="stat">
+        <div class="num" style="color:#e74c3c">49</div>
+        <div class="lbl">롤지 불량 직접 발생</div>
+    </div>
+    <div class="stat">
+        <div class="num" style="color:#f39c12">6</div>
+        <div class="lbl">불량 유형</div>
+    </div>
+    <div class="stat">
+        <div class="num" style="color:#e74c3c">↑</div>
+        <div class="lbl">2026년 이후 심화 추세</div>
+    </div>
+</div>
 
-    <div class="stats">
-        <div class="stat">
-            <div class="num">234</div>
-            <div class="lbl">총 이슈 수</div>
-        </div>
-        <div class="stat">
-            <div class="num">7</div>
-            <div class="lbl">이슈 유형</div>
-        </div>
-        <div class="stat">
-            <div class="num" style="color:#e74c3c">10</div>
-            <div class="lbl">높음 심각도</div>
+<div class="card">
+    <h2>전체 요약</h2>
+    <p>
+        2025년 1월부터 2026년 3월 4일까지 제1·제2 원외탕전 트러블슈팅 채널에서 수집한 234건의 메시지 중,
+        <strong>ASPT 스틱포 롤지 관련 직접 불량은 약 49건</strong>으로 집계됩니다.
+        불량 유형은 <strong>인쇄 불량(아이마크 오인식·잉크번짐·흰색선 등)</strong>이 가장 빈번하며,
+        2026년 들어 <strong>물리적 변형(구겨짐·사이드컬링)</strong>이 급증하는 추세입니다.
+        특히 <strong>2026년 2~3월 긴급 발주 처리된 5열 롤지 로트</strong>에서 불량이 집중 발생하고 있으며,
+        2026-03-04 현재 ASPT 품질담당자와 소통이 진행 중입니다.
+        인쇄 불량으로 인한 아이마크 오인식이 생산 중단(최대 2시간 50분)을 초래한 사례도 확인됩니다.
+    </p>
+</div>
+
+<div class="alert-box red">
+    <strong>⚠ 최신 현황 (2026-03-04)</strong><br>
+    롤지 사이드 컬링 현상으로 마킹기 걸림 발생 → 롤지 교체 후 작업 재개.
+    ASPT 품질담당자와 필름 텐션 관련 소통 중.
+    긴급 발주 5열 롤지 전반에 걸쳐 불량 집중 → 교환 처리 예정.
+</div>
+
+<p class="section-header">불량 유형별 현황</p>
+<div class="type-grid">
+    <div class="type-card">
+        <div class="type-name">① 인쇄 불량</div>
+        <div class="type-count">15건</div>
+        <div class="type-desc">
+            잉크 번짐, 연한 인쇄, 흰색 선·실선 프린팅, 검은색점(아이마크 오인식 → 스틱 터짐), 조제번호 인쇄 불량 등.<br>
+            2025-05-23 아이마크 인식오류로 스틱 터짐, 2025-05-24 생산 2시간 50분 중단이 대표 사례.
         </div>
     </div>
-
-    <div class="card">
-        <h2>전체 요약</h2>
-        <p>총 234건의 메시지가 수집되었습니다. 가장 많이 발생한 유형은 '포장 불량'이며, 높음 심각도 이슈는 10건입니다. 검색 기간: 2025-01-01 ~ 2026-03-04</p>
+    <div class="type-card">
+        <div class="type-name">② 물리적 변형</div>
+        <div class="type-count">12건</div>
+        <div class="type-desc">
+            롤지 구겨짐·울퉁불퉁(재작업 롤지 의심), 좌우 울림 불규칙, 한쪽 쏠림, 사이드 컬링(2026-03-04 최신). 2026년 2~3월 집중 급증.
+        </div>
     </div>
+    <div class="type-card">
+        <div class="type-name">③ 아이마크 불량</div>
+        <div class="type-count">10건</div>
+        <div class="type-desc">
+            아이마크 끊어짐(롤지 얇음 원인), 절단 롤러 말림, 아이마크 인식오류. 1열~5열 전 기기에 걸쳐 발생.
+        </div>
+    </div>
+    <div class="type-card">
+        <div class="type-name">④ 심지·규격 불량</div>
+        <div class="type-count">4건</div>
+        <div class="type-desc">
+            심지 짧음·밀림, 좌우 길이 차이로 디자인 틀어짐. 2025-03월 집중 발생, 반품 보관 후 교환 처리.
+        </div>
+    </div>
+    <div class="type-card">
+        <div class="type-name">⑤ 이물질 불량</div>
+        <div class="type-count">3건</div>
+        <div class="type-desc">
+            롤지 자체에서 곤충 발견(2025-05-28 까스퀵 롤지, 2025-07-07 2관). 이물지(이물질 혼입 필름)로 인한 불량.
+        </div>
+    </div>
+    <div class="type-card">
+        <div class="type-name">⑥ 컷팅 불량</div>
+        <div class="type-count">5건</div>
+        <div class="type-desc">
+            컷팅 꼬리 물림 심화(롤지마다 편차 큼), 절단 불량. 2026년 2~3월 5열 롤지에서 급증. 롤지 교체 반복 필요.
+        </div>
+    </div>
+</div>
 
-    
+<p class="section-header">주요 이슈 타임라인</p>
+<div class="card">
+    <div class="timeline-item">
+        <div class="timeline-date">2025-02-20</div>
+        <div class="timeline-dot" style="background:#f39c12"></div>
+        <div class="timeline-content">
+            <div class="title">3열 스틱포장기 롤지 교체 중 아이마크 불일치·끊어짐</div>
+            <div class="detail">신롤지 교체 중 아이마크가 지속 불일치(10회 이상) 및 롤지 끊어짐 발생. 링커팅모터 전선 끼임 동반.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2025-03-07~28</div>
+        <div class="timeline-dot" style="background:#e74c3c"></div>
+        <div class="timeline-content">
+            <div class="title">롤지 불량 연속 발생 → 업체 클레임 논의</div>
+            <div class="detail">인쇄 불량, 심지 짧음, 롤지 울림 4회 등 연속 발생. 2025-03-28 "48롤 중 24롤이 불량인 경우도 있음" 업체 인지. 업체 클레임 또는 업체 교체 논의 시작. 2~3월 누적 불량 3롤(심지이상 2, 인쇄불량 1) 확인.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2025-04-09</div>
+        <div class="timeline-dot" style="background:#27ae60"></div>
+        <div class="timeline-content">
+            <div class="title">소마 A/S 방문 — 롤지 울림 문제 개선</div>
+            <div class="detail">소마 기술자 방문, 파우더 브레이크 교체·롤지 브레이크 조정·좌우상하 조정. 무상 A/S. 이후 텐션 유지력 개선 확인.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2025-05-23~24</div>
+        <div class="timeline-dot" style="background:#e74c3c"></div>
+        <div class="timeline-content">
+            <div class="title">아이마크 인쇄 불량 → 기계 오인식 → 생산 2시간 50분 중단</div>
+            <div class="detail">녹용 경옥고(SM02201559) 롤지의 검은색점(인쇄불량)을 기계가 아이마크로 오인식. 스틱 터짐 발생. 경옥고 원물 청소 및 롤 교체에 2시간 50분 소요.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2025-05-28</div>
+        <div class="timeline-dot" style="background:#e74c3c"></div>
+        <div class="timeline-content">
+            <div class="title">까스퀵 롤지에서 곤충 이물질 발견</div>
+            <div class="detail">롤지 자체에 곤충이 붙어있던 것으로 확인. 상비약(마자인탕 SM83202556) 생산 중 발견. 롤지 제조 환경 위생 문제.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2025-06-19</div>
+        <div class="timeline-dot" style="background:#f39c12"></div>
+        <div class="timeline-content">
+            <div class="title">ASPT 공식 컴플레인 제기 — 개선안 문서 요청</div>
+            <div class="detail">녹용 경옥고(SM02201566) 롤지 불량 건으로 업체 컴플레인. 개선안 문서로 받기로 합의. 불량 롤지 반품 예정.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2025-07-11</div>
+        <div class="timeline-dot" style="background:#e74c3c"></div>
+        <div class="timeline-content">
+            <div class="title">롤지 인쇄 불량 → 스틱 터짐 30~40포 수량 차이</div>
+            <div class="detail">녹용 경옥고(SM02200578) 생산 중 롤지 인쇄 불량으로 아이마크 불일치. 스틱 터짐으로 총 생산량과 정품 수량 30~40포 차이 발생.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2025-08-22</div>
+        <div class="timeline-dot" style="background:#f39c12"></div>
+        <div class="timeline-content">
+            <div class="title">재작업 롤지 의심 불량 — 단면 울퉁불퉁</div>
+            <div class="detail">녹용 경옥고(SM02201589) 생산 중 롤지 불량. 단면 울퉁불퉁하여 재작업 롤지로 의심. 동일 롤지 2차 불량도 발견.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2026-01-02~13</div>
+        <div class="timeline-dot" style="background:#e74c3c"></div>
+        <div class="timeline-content">
+            <div class="title">경옥고 5열 롤지 흰색 선·실선 불량 — 2024-06 입고 로트</div>
+            <div class="detail">5열 4번 롤에 흰색 선 프린팅 → 롤 교체, 업체 컴플레인. 해당 로트는 2024-06-18 입고분이며 잔량 18롤(외부창고 포함 총 23롤). 로트 소진 후 최종 수량으로 교환/상계처리 합의.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2026-02-20</div>
+        <div class="timeline-dot" style="background:#e74c3c"></div>
+        <div class="timeline-content">
+            <div class="title">"심각하다" 판정 — ASPT 방문·샘플 발송 계획</div>
+            <div class="detail">2관 인팩5열 롤지 대량 구겨짐 발견. 류재현 담당 "심각하다" 판정. ASPT 품질팀 사전 전달 후 방문 시 보고 예정. 문제 발생 롤지 샘플 택배 발송 예정.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2026-02-27</div>
+        <div class="timeline-dot" style="background:#e74c3c"></div>
+        <div class="timeline-content">
+            <div class="title">컷팅 꼬리물림 심화 — 롤지마다 편차 극심</div>
+            <div class="detail">인팩5열 롤지 구겨짐·패임 지속. 컷팅 후 꼬리 물려 나오는 불량이 롤지마다 정도 차이 극심. 롤지 교체 반복.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2026-03-03</div>
+        <div class="timeline-dot" style="background:#e74c3c"></div>
+        <div class="timeline-content">
+            <div class="title">긴급 처리 5열 롤지 — 대량 불량 급증</div>
+            <div class="detail">긴급건으로 처리된 5열 롤지 로트 불량 집중. 새 롤지 교체 후 또 교체 반복 상황. 불량 발생 롤은 밖으로 빼고 교환 처리 예정. 2관에서도 롤지 환터짐 불량 확인.</div>
+        </div>
+    </div>
+    <div class="timeline-item">
+        <div class="timeline-date">2026-03-04</div>
+        <div class="timeline-dot" style="background:#e74c3c"></div>
+        <div class="timeline-content">
+            <div class="title">사이드 컬링으로 마킹기 걸림 — 현재 소통 중</div>
+            <div class="detail">롤지 사이드 컬링 현상으로 마킹기 이동 시 쓸리는 현상 발생. 불량 롤지 교체 후 작업 재개. 업체 발주 시 교환 처리 예정. ASPT 품질담당자와 필름 텐션 관련 소통 진행 중.</div>
+        </div>
+    </div>
+</div>
 
-    <h2 style="margin: 24px 0 12px; font-size: 16px;">유형별 이슈 목록</h2>
-    
-        <div class="card">
-            <h3>포장 불량 <span class="count-badge">77건</span></h3>
-            <table>
-                <thead><tr><th>날짜</th><th>심각도</th><th>내용</th></tr></thead>
-                <tbody>
+<p class="section-header">대응 현황</p>
+<div class="card">
+    <table>
+        <thead>
             <tr>
-                <td>2025-03-06</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>리크 스틱을 2층에서 다시 짜봤는데 죽어라 짜도 안 새어나오네요. 이정도 압력을 줘서 미세하게 점 찍히는 정도의 리크라면 일반적 유통상황에서 리...</td>
+                <th>구분</th>
+                <th>내용</th>
+                <th>상태</th>
             </tr>
+        </thead>
+        <tbody>
             <tr>
-                <td>2025-03-19</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>이거 왜 또 이러나요.. 일단 스틱포장 진행해주세요</td>
+                <td><strong>반품·교환</strong></td>
+                <td>불량 발생 롤지 선별 후 외부창고 보관, 로트 소진 시 최종 수량 일괄 교환 처리</td>
+                <td><span class="badge" style="background:#f39c12">진행 중</span></td>
             </tr>
             <tr>
-                <td>2025-03-19</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>이염 문제가 아닌, 스틱포장기 내부 롤 등등에 의한 문제로 보이네요. 검수해야하겠네요.</td>
+                <td><strong>ASPT 소통</strong></td>
+                <td>품질팀 사전 전달 완료(2026-02-20), 방문 시 대면 보고 예정. 현재 필름 텐션 관련 소통 중(2026-03-04)</td>
+                <td><span class="badge" style="background:#e74c3c">현재 진행</span></td>
             </tr>
             <tr>
-                <td>2025-04-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>2번 찬성합니다. 당장은 상비약 스틱포장 때문에 재포장 일정 잡기가 까다롭습니다. 다음주 배관 여과망 설치되고, 4월말~5월초 액상고 생산을 쉬...</td>
+                <td><strong>공식 컴플레인</strong></td>
+                <td>2025-06-19 컴플레인 제기, 개선안 문서 요청. 2026-01-02 업체 컴플레인 추가</td>
+                <td><span class="badge" style="background:#f39c12">처리 중</span></td>
             </tr>
             <tr>
-                <td>2025-04-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> <@U08CDC3T01Y|이진경>  녹용 경옥고 스틱 생산 중 용량 초과 발...</td>
+                <td><strong>기계 A/S</strong></td>
+                <td>2025-04-09 소마 A/S — 파우더 브레이크 교체, 롤지 브레이크 강도 조정 완료</td>
+                <td><span class="badge" style="background:#27ae60">완료</span></td>
             </tr>
             <tr>
-                <td>2025-05-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호>  녹용 경옥고 원물 새어나옴 발생   발견시간 : 13:00~ 발생장소 : ...</td>
+                <td><strong>샘플 발송</strong></td>
+                <td>2026-02-20 문제 발생 롤지 일부 잘라 ASPT에 택배 발송 예정</td>
+                <td><span class="badge" style="background:#f39c12">진행 중</span></td>
             </tr>
             <tr>
-                <td>2025-05-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> <@U08CDC3T01Y|이진경>  상비약 반하사심탕 스틱포 가로 접착 원물...</td>
+                <td><strong>부자재 기준서</strong></td>
+                <td>부자재 관리 기준서(공급사 선정, 입고검사, 부적합 관리, 반복 불량 시 업체 교체 기준 포함) 초안 수립 추진</td>
+                <td><span class="badge" style="background:#f39c12">수립 중</span></td>
             </tr>
             <tr>
-                <td>2025-07-03</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08CAQW8Z9S|허라인>  스틱포장실, 탕전실 물방울 떨어짐 발생  발생시간 : 11:10 발생장소 ...</td>
+                <td><strong>업체 교체 검토</strong></td>
+                <td>롤지 불량률 낮은 업체 존재 확인됨. 반복 부적합 발생 시 업체 재평가 또는 교체 기준 포함 예정</td>
+                <td><span class="badge" style="background:#888">검토 중</span></td>
             </tr>
-            <tr>
-                <td>2025-07-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BT9K1142|김동빈 - 컨설턴트> cc. <@U091R9EL0AE> <@U08CDC2RF8S|조현수> 해당 문제가 저점도 노즐로 해...</td>
-            </tr>
-            <tr>
-                <td>2025-02-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>, <@U08C89D9Q58|구본일>  녹용 경옥고 롤지 한쪽으로 쏠림 발생  발생시간 : 15시25분 경 발생...</td>
-            </tr>
-            <tr>
-                <td>2025-03-19</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>, <@U08GARRS1ND|김용호>, <@U08CDC3T01Y|이진경>  스틱 포장기 3열 프린트 잉크 번짐 ...</td>
-            </tr>
-            <tr>
-                <td>2025-03-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>, <@U08GARRS1ND|김용호>, <@U08CDC3T01Y|이진경>  녹용 경옥고 롤지 심지 짧음 발생  ...</td>
-            </tr>
-            <tr>
-                <td>2025-03-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>, <@U08GARRS1ND|김용호>, <@U08BVP26WGP|정진호>  (구)경옥고 롤지 불량 발생  발견시...</td>
-            </tr>
-            <tr>
-                <td>2025-04-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>, <@U08GARRS1ND|김용호>, <@U08BVP26WGP|정진호>  (신)콜드퀵 롤지 우측으로 인쇄 불량...</td>
-            </tr>
-            <tr>
-                <td>2025-04-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08CDC3T01Y|이진경>  롤지 인쇄 불량이 있습니다 포장 하실때 참고 부탁 드립니다</td>
-            </tr>
-            <tr>
-                <td>2025-04-29</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> <@U08CDC3T01Y|이진경>  (신)녹용 경옥고 롤지 불량 건  발견시...</td>
-            </tr>
-            <tr>
-                <td>2025-05-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> <@U08CDC3T01Y|이진경> <@U08CDC3EV42|손정미> (신)녹...</td>
-            </tr>
-            <tr>
-                <td>2025-05-16</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> <@U08CDC3T01Y|이진경>  녹용 경옥고 롤지 불량  발견시간 : 1...</td>
-            </tr>
-            <tr>
-                <td>2025-05-23</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> <@U08CDC3T01Y|이진경>  녹용 경옥고 롤지 불량  발견시간 : 1...</td>
-            </tr>
-            <tr>
-                <td>2025-06-19</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08CDC3T01Y|이진경>  녹용 경옥고 롤지 불량  발견시간 : 12:20 발생장소 : 내포장실 발생...</td>
-            </tr>
-            <tr>
-                <td>2025-07-03</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  스틱 포장기 5열 롤지 아이마크 끊어짐 발생  발생시간 : 09:50분 경 발생장소 : 내포장실 발생제품 :...</td>
-            </tr>
-            <tr>
-                <td>2025-08-22</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08CDC3T01Y|이진경> <@U091R9EL0AE>  녹용 경옥고 롤지 불량  발견시간 : 11:25...</td>
-            </tr>
-            <tr>
-                <td>2025-08-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08CDC3T01Y|이진경> <@U091R9EL0AE>  녹용 경옥고 롤지 불량  발견시간 : 09:35...</td>
-            </tr>
-            <tr>
-                <td>2025-09-11</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U091R9EL0AE>   CAS 전자 저울 고장  발생시간 : 11:00 발생장소 : 내포장실 발생제품 ...</td>
-            </tr>
-            <tr>
-                <td>2025-02-27</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08CAQW8Z9S|허라인>  린보조환 단박스 불량이 한박스에 반이상 입니다. 1월분 불량도 이런 현상 때문입니다.</td>
-            </tr>
-            <tr>
-                <td>2025-02-27</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> cc <@U08C89D9Q58|구본일> <@U08BCPB7XMM|류재현> 진희님, 보조환, 디톡스(비움) 단박...</td>
-            </tr>
-            <tr>
-                <td>2025-02-27</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08CAQW8Z9S|허라인>  지금 창고에도 보조환 단박스 재고가 많다고 하니 2월재고실사때 2월분 불량수량 파악하고 창고에 있는 남은 보...</td>
-            </tr>
-            <tr>
-                <td>2025-03-07</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08CDC2RF8S|조현수> 네 저정도까지 돌아가 있으면 불량으로 빼야 합니다. '중량미달' 말고 '내포장 불량'으로 구분 해주세요.</td>
-            </tr>
-            <tr>
-                <td>2025-03-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>사향랑트 10환  외박스 뚜껑 불량으로 인해 사용하지 못하는 외박스 하짝이 다수있습니다. 패키지 작업시 계속 뚜껑 불량이 발생하고 있어서 뚜껑만...</td>
-            </tr>
-            <tr>
-                <td>2025-03-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>현재, 사향라이트 외박스 뚜껑 불량 수량이 어떻게 되나요?</td>
-            </tr>
-            <tr>
-                <td>2025-03-19</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>녹용경옥고  외박스 상짝 불량으로 인해  패키지  작업시  하짝  45개 만   남아있는 상태입니다   업체에  문의부탁드립니다</td>
-            </tr>
-            <tr>
-                <td>2025-03-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>용호님 말씀 동의합니다. 이런 케이스에 대해서도 이번 불량/폐기 처리 프로세스에 들어갔으면 좋겠습니다!</td>
-            </tr>
-            <tr>
-                <td>2025-04-09</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>[문의] 공진단 30환 내박스 (블랙) 불량 건</td>
-            </tr>
-            <tr>
-                <td>2025-04-09</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08F849KLSV|곽창원> cc <@U08CDC3QDFC|허우선> <@U08C89D9Q58|구본일> <@U08BCPB7XMM|류재현> <...</td>
-            </tr>
-            <tr>
-                <td>2025-04-11</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>사탕포장롤 불량으로 기계에 눌러붙어서 떨어지질않아요</td>
-            </tr>
-            <tr>
-                <td>2025-05-15</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>기름때 묻은 청병(하) 진밤색 5박스(1박스에 1,800ea) 불량 처리하였습니다</td>
-            </tr>
-            <tr>
-                <td>2025-05-15</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> <@U08CDC3T01Y|이진경>  스틱 포장기 3열 3번 라인 이지컷 불량...</td>
-            </tr>
-            <tr>
-                <td>2025-05-15</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08CDC3T01Y|이진경>  3번 라인 이지컷 불량 입니다 포장 하실때 확인 부탁 드립니다</td>
-            </tr>
-            <tr>
-                <td>2025-06-26</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08CDC3T01Y|이진경>  녹용 경옥고 배접 불량  발견시간 : 10:25 발생장소 : 내포장실 발생...</td>
-            </tr>
-            <tr>
-                <td>2025-07-03</td>
-                <td><span class="badge" style="background:#e74c3c">높음</span></td>
-                <td><@U08BVR2HANQ|정희범 대표원장> 희범님 안녕하세요. 제가 말씀드린 확인완료는 입고일자 확인이었습니다.  확인 결과 지난번에 문제가 발...</td>
-            </tr>
-            <tr>
-                <td>2025-07-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08CDC3T01Y|이진경> <@U08F849KLSV|곽창원>  총명 공진단 스틱 내부 원물 튐으로 가로...</td>
-            </tr>
-            <tr>
-                <td>2025-07-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08CDC3T01Y|이진경>  가로 접착 불량 부분이 포함 가능성이 있습니다 포장 하실때 확인 부탁 드립니다</td>
-            </tr>
-            <tr>
-                <td>2025-07-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  파머스에프 생지황즙 포장 불량  발견시간 : 09:50 발생장소 : 탕전실 발생제품 : 파머스에프(25-06...</td>
-            </tr>
-            <tr>
-                <td>2025-09-30</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>경옥고 내박스 접착 불량이 300ea 이상 나왔습니다.</td>
-            </tr>
-            <tr>
-                <td>2025-11-10</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>외박스 한상자에 불량이 많았습니다 상자 윗부분 눌린자국 6개이상.상자안쪽 겉지가 떨어짐 2개 다 같은상자안에서 나왔습니다 *눌린자국은 다른상자에...</td>
-            </tr>
-            <tr>
-                <td>2025-11-10</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U097N6H5PDM> cc <@U091R9EL0AE> <@U08F849KLSV|곽창원> 선미님, 외박스 하짝 테두리에 눌린 자국은 불량으로...</td>
-            </tr>
-            <tr>
-                <td>2025-11-10</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>외박스하짝 테두리 눌림은 심한것만 불량으로 뺐습니다 해당 외박스 라벨은 이번엔 확인 못했습니다 다음엔 같이 올리겠습니다~^^</td>
-            </tr>
-            <tr>
-                <td>2025-12-15</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08J8GFM8V8|정일진> 파손 상황 확인하여 우리 잘못이 아닌 경우, 업체에 교환 요청합니다. 다음번 발주때 불량난만큼 더 받는 방식으...</td>
-            </tr>
-            <tr>
-                <td>2025-12-25</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U091R9EL0AE> 재현님, 용근님 녹용경옥고 스틱 생산 중 이지컷 부분의 컷팅이 얕게 들어가서 손으로...</td>
-            </tr>
-            <tr>
-                <td>2025-06-11</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> 앞으로는 1일 스틱포장 계획보다 많은 환을 기기 앞에 놔두고, 종료 후 원복하는 형태로 작업하겠습니다. 이 부...</td>
-            </tr>
-            <tr>
-                <td>2025-07-07</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>    발생일 : 7월7일 월요일 발생시간 : 14시55분 발생원인 : 스틱포...</td>
-            </tr>
-            <tr>
-                <td>2025-08-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>스틱포장실 가운데 위치 에어컨 죄우 등위치에서 떨어지는데요 위에 올라가서 봐도 물기는 없어요</td>
-            </tr>
-            <tr>
-                <td>2025-08-25</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08GARRS1ND|김용호> <@U08C89D9Q58|구본일>  린스틱포장실 콘센트 안 주위에 물이 고여 있습니다. 사용해도 될까요?</td>
-            </tr>
-            <tr>
-                <td>2025-08-25</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>내포장실 스틱포장기 뒤편 콘센트는 사용하지 말아주세요 일단 외포장실에서 멀티탭으로 끌어서 사용해야 될거 같습니다 전기안전관리자분 불러서 점검 받...</td>
-            </tr>
-            <tr>
-                <td>2025-08-29</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> <@U08C89D9Q58|구본일> 해당 내용 업체에 전달드려 월요일 입고예정된 스틱포 롤부터 반영되어 2개씩 ...</td>
-            </tr>
-            <tr>
-                <td>2025-09-08</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호> 린스틱포장실  천장이음새부분, 에어컨주위에 물이 맺혀 떨어집니다.</td>
-            </tr>
-            <tr>
-                <td>2025-09-10</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>  린스틱포장실 스틱포사과박스 적재해둔 벽 바닥에 물이 샙니다</td>
-            </tr>
-            <tr>
-                <td>2025-10-01</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>[상비약 갈근탕 스틱포장지 잉크뭍음 현상]</td>
-            </tr>
-            <tr>
-                <td>2025-10-01</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>전에 없던 현상인데 이상하네요. 포장온도가 높아서 잉크가 빨리 안마른걸까요? 오늘 스틱포장할때는 선풍기 켜서 잉크 말리면서 해보는등 시도 해봐야...</td>
-            </tr>
-            <tr>
-                <td>2025-10-20</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>  린스틱포장실 예전에 새었던곳 벽면에 주말동안  또 물이 새었습니다</td>
-            </tr>
-            <tr>
-                <td>2025-11-04</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>벽에서 떨어뜨려서 보관해주시고 바닥에 깔판 깔고 보관해주세요.  <@U094ZV06PFT|홍지운> 초록 깔판 3개 구매해서 소환스틱포장실에 전달...</td>
-            </tr>
-            <tr>
-                <td>2025-11-25</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> <@U08CD9M4D7D|강대헌> • 내용     ◦ 소환제환조 롤밀기 사용...</td>
-            </tr>
-            <tr>
-                <td>2025-12-04</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>[보고] 3열 스틱포장기 볼밸브 교체 건</td>
-            </tr>
-            <tr>
-                <td>2026-01-12</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  <@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>  2025년 12월19일 린스틱포장실 오...</td>
-            </tr>
-            <tr>
-                <td>2026-01-26</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>[보고] 액상 내포장실 소마 3열 스틱포장기 실린더 조정 건</td>
-            </tr>
-            <tr>
-                <td>2026-01-26</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> <@U08CD9M4D7D|강대헌> <@U09ERKR58MD> • 내용: 경옥...</td>
-            </tr>
-            <tr>
-                <td>2026-02-24</td>
-                <td><span class="badge" style="background:#27ae60">낮음</span></td>
-                <td>분쇄실, 스틱포장실, 출고장측 우수 배관 통해 빗물이 새는 것 확인. 비 그치면 실리콘 작업 및 배관 교체 진행.  창틀 등 새는 곳 있는지 추...</td>
-            </tr>
-            <tr>
-                <td>2025-10-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08GARRS1ND|김용호>  <@U08C89D9Q58|구본일>  <@U08D26P72JC|정진희>  생산중에 롤지가 배접 잡아주는부분에서...</td>
-            </tr>
-            <tr>
-                <td>2025-06-26</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일>  <@U08CAQW8Z9S|허라인>  단박스 불량건</td>
-            </tr>
-            <tr>
-                <td>2025-07-01</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>[공유] 소화 단박스 불량 <@U08F849KLSV|곽창원> <@U08D26P72JC|정진희> cc <@U08C89D9Q58|구본일></td>
-            </tr>
-            <tr>
-                <td>2025-07-01</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>6/30 입고된 소화 단박스의 정면과 후면에 인쇄 불량으로 보이는 흰색 줄이 많이 발견됩니다.  창원님, 업체에 해당 내용 전달 부탁드립니다!</td>
-            </tr>
-            <tr>
-                <td>2025-07-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> cc <@U08C89D9Q58|구본일> 진희님, 소화 단박스 정면에 흰색 줄 보이는 것은 사용하지 마시고 불량...</td>
-            </tr>
-            <tr>
-                <td>2025-08-09</td>
-                <td><span class="badge" style="background:#e74c3c">높음</span></td>
-                <td><@U07U0NDUDU4> <@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> • 발생일시: 2025년 8월 8일(금) 오후 •...</td>
-            </tr>
-            <tr>
-                <td>2026-01-06</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호> <@U08F849KLSV|곽창원>  매일(...</td>
-            </tr>
-            <tr>
-                <td>2026-02-05</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>[보고] 소마 3열 스틱 포장기 가로 접착 불량 건</td>
-            </tr>
-            <tr>
-                <td>2026-02-05</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  <@U08GARRS1ND|김용호>  <@U08C89D9Q58|구본일> <@U08D26P72JC|정진희>  <...</td>
-            </tr>
-            <tr>
-                <td>2026-02-23</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08F849KLSV|곽창원>  2025년 12월 입고 린단박스 오물 불...</td>
-            </tr></tbody>
-            </table>
-        </div>
-        <div class="card">
-            <h3>기타 불량 <span class="count-badge">72건</span></h3>
-            <table>
-                <thead><tr><th>날짜</th><th>심각도</th><th>내용</th></tr></thead>
-                <tbody>
-            <tr>
-                <td>2025-04-30</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일>  인팩1 4월25일 스틱포가 한번꺾이면서 내려오는 현상이 완전히 해소되지 않...</td>
-            </tr>
-            <tr>
-                <td>2025-03-14</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> 님, 이 롤지 남는 부분 보관 좀 부탁드릴게요~</td>
-            </tr>
-            <tr>
-                <td>2025-03-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>이런 롤지는 그럼 이후 어떻게 처리되나요? c.c <@U08EQ9JUF7C|백정현- 컨설턴트></td>
-            </tr>
-            <tr>
-                <td>2025-03-24</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  3/4 경옥고 롤지 불량은 어떻게 처리를 할까요?</td>
-            </tr>
-            <tr>
-                <td>2025-03-24</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>롤지 인쇄 불량 입니다</td>
-            </tr>
-            <tr>
-                <td>2025-03-27</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> 님, 다른 롤지로 사용하시고, 불량으로 보관 부탁드립니다.</td>
-            </tr>
-            <tr>
-                <td>2025-03-28</td>
-                <td><span class="badge" style="background:#e74c3c">높음</span></td>
-                <td><@U08GARRS1ND|김용호> 님, 지금 체감상 롤지 불량이 굉장히 많은 것 같습니다....  이거 정도에 따라 부자재 공급 업체 변경 클레...</td>
-            </tr>
-            <tr>
-                <td>2025-03-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>롤지는 이정도 불량은 항상 있습니다 심한경우는 48롤 1로트 받을떄 24롤이 불량인 경우도 있어요 해당 롤지는 불량 개수만큼 그대로 받으면 됩니...</td>
-            </tr>
-            <tr>
-                <td>2025-03-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>다만 말씀하신것처럼 불량이 아주 안날수는 없지만, 롤지불량률이 낮은 업체는 분명히 있습니다</td>
-            </tr>
-            <tr>
-                <td>2025-04-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>, <@U08GARRS1ND|김용호>, <@U08BVP26WGP|정진호> 롤지 인쇄 불량 (신)롤지 부자재 이동...</td>
-            </tr>
-            <tr>
-                <td>2025-05-29</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08CDC2RF8S|조현수> 이거 롤지 자체에 붙어 있던걸까요?</td>
-            </tr>
-            <tr>
-                <td>2025-05-29</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>네 롤지 자체에서 나왔습니다</td>
-            </tr>
-            <tr>
-                <td>2025-07-11</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08CDC3T01Y|이진경>  SM02200578 스틱 롤지가 한쪽 방향으로 쏠려 있어 탕전실에 따로 놔...</td>
-            </tr>
-            <tr>
-                <td>2025-11-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  <@U091R9EL0AE>  롤지 불량입니다</td>
-            </tr>
-            <tr>
-                <td>2026-01-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>경옥고 롤지 불량  5열중 4번쪽에 흰색 선이 프린팅 되어 있음. → 롤 교체 및 불량으로 선별 → 업체 컴플레인</td>
-            </tr>
-            <tr>
-                <td>2026-01-13</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>경옥고 롤(5열) 불량 내용 : 롤지에 실선이 그여져 있습니다 이에 반품 요청합니다</td>
-            </tr>
-            <tr>
-                <td>2026-01-13</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>불량 발생롤지 포함 총 23개</td>
-            </tr>
-            <tr>
-                <td>2025-02-12</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일> <@U08D26P72JC|정진희> 선별해야할만큼 큰 불량은 아니지만.. 그래도 전에 없던 모습이니 문제 해결은...</td>
-            </tr>
-            <tr>
-                <td>2025-03-07</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>불량은 중량 미달로 빼놓을까요?</td>
-            </tr>
-            <tr>
-                <td>2025-03-08</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>이 건 뭐에요? 부자재 불량인가요?</td>
-            </tr>
-            <tr>
-                <td>2025-03-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>불량난 롤 쓰다가 터지느니 깨끗한 것 골라쓰는게 낫습니다</td>
-            </tr>
-            <tr>
-                <td>2025-03-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>불량으로 분류할지, 추후에 사용할 예정인지 확인이 필요해보이네요. :face_with_monocle:</td>
-            </tr>
-            <tr>
-                <td>2025-03-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>불량으로 분류하고 보내서 다시 받아야해요</td>
-            </tr>
-            <tr>
-                <td>2025-03-24</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08CDC2RF8S|조현수> 이거는 어떤 불량이죠? 우리가 쓰다가 불량 만든건 우리가 폐기해야 하지만, 처음부터 불량으로 들어온 것은 업체...</td>
-            </tr>
-            <tr>
-                <td>2025-03-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>일단 심지이상으로 2롤 창고에 가있고 인쇄불량이 1롤 있는데요 2월~3월 총 3롤 불량으로 인지하고 있습니다 진호님한테 월요일에 총 불량개수를 ...</td>
-            </tr>
-            <tr>
-                <td>2025-04-01</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> 님, 너무 손상이 많은 것 같습니다. 불량으로 제외 부탁드립니다.</td>
-            </tr>
-            <tr>
-                <td>2025-04-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> 님, 불량으로 제외 부탁드립니다.</td>
-            </tr>
-            <tr>
-                <td>2025-04-16</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>에어팩 심지 불량으로 교환된  필름이 인쇄불량인지 지저분해서 재교환을 해야될것 같습니다</td>
-            </tr>
-            <tr>
-                <td>2025-06-19</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>이 부분 컴플레인 했습니다. 개선안에 대해 문서로 받기로 했어요. 일단 불량으로 빼주시고 아이마크쪽 잉크 번짐으로 표시해서 빼놔주세요. 반품 예...</td>
-            </tr>
-            <tr>
-                <td>2025-07-04</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>접촉불량 같네요. 콘센트 교체 필요하겠습니다.</td>
-            </tr>
-            <tr>
-                <td>2025-07-04</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>전기안전관리자 이만섭님 콘센트는 16A까지 버티기 때문에 과전류 문제는 아님. 콘센트 불량 또는 전원선을 콘센트에 꽉 물리지 않은 접촉 불량의 ...</td>
-            </tr>
-            <tr>
-                <td>2025-07-17</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>완전한 접착 불량. 원물이 튀어서 발생된 것으로 보임.</td>
-            </tr>
-            <tr>
-                <td>2025-07-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>생지황즙 불량 하나더 나왔습니다</td>
-            </tr>
-            <tr>
-                <td>2025-09-05</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>총명공진단 내함 손잡이 불량 출고날짜 2025.9.4 업체의뢰 부탁드립니다.</td>
-            </tr>
-            <tr>
-                <td>2025-10-10</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>경옥고 수축기실 수축필름 불량입니다.(지관불량외)</td>
-            </tr>
-            <tr>
-                <td>2025-10-14</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>생지황즙 불량입니다</td>
-            </tr>
-            <tr>
-                <td>2025-11-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>불량에 대해서 보고드릴 예정인데요. 사용중에 확인된 불량인거죠? 기존것중에 겉보기로 바로 판단가능은 불가능한 부분인가요?</td>
-            </tr>
-            <tr>
-                <td>2026-02-20</td>
-                <td><span class="badge" style="background:#e74c3c">높음</span></td>
-                <td>심각하네요 정말...  <@U08C89D9Q58|구본일> 다음주 aspt 방문때 꼭 얘기해주세요</td>
-            </tr>
-            <tr>
-                <td>2026-03-03</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> ASPT 관련 불량 이슈보고 증가에 따라 ASPT 불량 관련 스레드 별도로 내용정리 하겠습니다.</td>
-            </tr>
-            <tr>
-                <td>2025-05-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일>   인팩1 컷팅시 휘어져서 스틱포가 터집니다</td>
-            </tr>
-            <tr>
-                <td>2025-05-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>인팩1 오른쪽 컷팅시 스틱포가 터지네요.</td>
-            </tr>
-            <tr>
-                <td>2025-07-08</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>스틱포 입니다.</td>
-            </tr>
-            <tr>
-                <td>2025-08-04</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일> <@U08CZ3VTDEU|정재훈>  발생일: 8월4일 발생시간 : 18: 55분 발생원인 : 인팩1  컷팅 실...</td>
-            </tr>
-            <tr>
-                <td>2026-01-07</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>  진성2열 콘베어벨트  작동중 갑자기 섰다...</td>
-            </tr>
-            <tr>
-                <td>2026-02-19</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>  발생일: 2월19일  발생시간: 11: ...</td>
-            </tr>
-            <tr>
-                <td>2025-07-07</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> 님, 이거는 롤지에 있던 벌레가 짓눌려서 나오는 거죠? 우리 환경에서 방황하던 벌레가 짓눌리는 건 아니죠?</td>
-            </tr>
-            <tr>
-                <td>2025-07-08</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08F849KLSV|곽창원>  언제들어온 롤지 인지는 잘모르겠습니다. 재훈님이 선별하면서 섞여 있었어요. 그리고 그전부터 이런 상황은 있었...</td>
-            </tr>
-            <tr>
-                <td>2025-09-30</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일>  <@U08GARRS1ND|김용호>  발생일:9월30일 발생시간:17시 발생원인: 롤지 불량으로 아이마크 인식...</td>
-            </tr>
-            <tr>
-                <td>2025-09-30</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>롤지가 어떻게 불량인건가요? 상황에 따라 업체에 항의하려고요</td>
-            </tr>
-            <tr>
-                <td>2025-10-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>  발생일: 10월2일 발생시간: 09:05 발생원인: 린 롤지  자국이 많이...</td>
-            </tr>
-            <tr>
-                <td>2026-02-03</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호> <@U08F849KLSV|곽창원>  인팩5...</td>
-            </tr>
-            <tr>
-                <td>2026-02-20</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호> <@U08F849KLSV|곽창원>  인팩5...</td>
-            </tr>
-            <tr>
-                <td>2026-02-27</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08F849KLSV|곽창원>  인팩5열  컷팅이 깨끗하지가 않아 꼬리 ...</td>
-            </tr>
-            <tr>
-                <td>2026-03-03</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08F849KLSV|곽창원>    인팩5열 롤지 불량이 많습니다</td>
-            </tr>
-            <tr>
-                <td>2026-03-03</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일>   새 롤지 교체후 다시 롤지 교체를 반복하고 있습니다.</td>
-            </tr>
-            <tr>
-                <td>2026-03-03</td>
-                <td><span class="badge" style="background:#e74c3c">높음</span></td>
-                <td>최근에 대량으로 들어온 5열 롤지가 긴급건으로 처리된건이라 그런지 불량이 눈에 띄게 많이보이네요. 불량 발생롤 우선 밖으로 빼주세요. 업체에 요...</td>
-            </tr>
-            <tr>
-                <td>2026-03-04</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>[보고] 롤지 사이드 컬링 현상으로 마킹기 걸림 현상</td>
-            </tr>
-            <tr>
-                <td>2026-03-04</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일> 최근 입고된 5열 롤지에서 지속적으로 발생되는 현상 같은데, 현재까지 몇 롤정도 나왔을까요?</td>
-            </tr>
-            <tr>
-                <td>2025-05-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>2025.5.28 [에어드라이어 차단기 불량건] 내용:에어드라이어 가동시 일정시간이 지나면 차단기가 떨어짐.  조치:드라이어 업체•전기업체 문의...</td>
-            </tr>
-            <tr>
-                <td>2025-05-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U07U0NDUDU4> 이거 차단기 불량 같습니다. 교체 필요합니다. </td>
-            </tr>
-            <tr>
-                <td>2025-06-17</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>[하자보수] 소환 제환조 전기 불량 건</td>
-            </tr>
-            <tr>
-                <td>2025-06-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>벌레와 필름지 불량이 많습니다.</td>
-            </tr>
-            <tr>
-                <td>2025-06-25</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U07BCN7PYLW>네 맞슴다!  1. 천장 누수 아님 2. 전등 나간 것은 전등 불량 확인 3. 벽쪽 타고 물 들어오는 곳 있는 것으로 ...</td>
-            </tr>
-            <tr>
-                <td>2025-07-09</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>불량으로 빼주세요~ 밀려서 커팅 된 것 같습니다.</td>
-            </tr>
-            <tr>
-                <td>2025-10-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> 님, 롤 불량 입니다. (cc. <@U08D26P72JC|정진희>)</td>
-            </tr>
-            <tr>
-                <td>2025-10-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>저정도로 크게 튀어나온 것은 불량이지만, 미세하게 살짝 튀어나온 정도는 양품하겠습니다~</td>
-            </tr>
-            <tr>
-                <td>2025-11-27</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>불량으로 빼주세요.</td>
-            </tr>
-            <tr>
-                <td>2025-12-22</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>똑같은 이슈로 문제점 공유는 진행된 상태입니다. 우선 불량으로 빼주시면 교환받는 식으로 진행하겠습니다.</td>
-            </tr>
-            <tr>
-                <td>2026-01-06</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>불량은 따로 빼놔주세요</td>
-            </tr>
-            <tr>
-                <td>2026-02-03</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>[보고] 추출 농축실 분전함 [접촉 불량/과열] 조기 발견에 따른 화재 예방 건</td>
-            </tr>
-            <tr>
-                <td>2026-02-19</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> 님, 초기 에러 발생 시 다른 조치를 취했으나 간헐적인 불량이 지속되었고, 최종적으로 공급 셔터가 열린 상태로...</td>
-            </tr>
-            <tr>
-                <td>2026-02-24</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>• 에어 솔레노이드 밸브 2개가 각각 1, 2번 / 3, 4, 5번 사용하고 있으나 3, 4, 5번을 담당하는 솔레노이드 밸브 신호 끊기는 현상...</td>
-            </tr></tbody>
-            </table>
-        </div>
-        <div class="card">
-            <h3>공정 이슈 <span class="count-badge">30건</span></h3>
-            <table>
-                <thead><tr><th>날짜</th><th>심각도</th><th>내용</th></tr></thead>
-                <tbody>
-            <tr>
-                <td>2025-02-26</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>린필름지 상태. 스틱포 작업되어 나오는것에는 크게 영향을 미치지 않는것 같기는 합니다. 그러나 필름지 상태는 좋지 않습니다.</td>
-            </tr>
-            <tr>
-                <td>2025-04-25</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> 인팩1   스틱포 왼쪽기계가 공급을 하면 한번 꺾이면서 내려와 환이 터집니다...</td>
-            </tr>
-            <tr>
-                <td>2025-03-07</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  (구)경옥고 롤지 불량 발생  발견시간 : 15시45분 경 발생장소 : 경옥고실 발생제품 : (구)경옥고 롤...</td>
-            </tr>
-            <tr>
-                <td>2025-03-19</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>기계에서 롤지 가로 접착 후 롤지를 놓을때 롤지 울림이 일정하지 않음</td>
-            </tr>
-            <tr>
-                <td>2025-05-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>롤지 불량 1롤 기준 17,000포 생산 중 15~20포 정도 나옵니다</td>
-            </tr>
-            <tr>
-                <td>2025-08-22</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>롤지 상태를 봐서는 재작업 했던 롤지 같습니다 롤지 말려 있는 단면 부분이 울퉁불퉁 울어 있고 고르지 못 합니다</td>
-            </tr>
-            <tr>
-                <td>2025-08-22</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>14:15 롤지 변경 후 롤지 불량 발생 이번 롤지도 재 작업 롤지 입니다</td>
-            </tr>
-            <tr>
-                <td>2025-08-22</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>14:21 2차 불량 발견 다행히 1번 라인에서 발생 하고 있어서 롤지 변경 하지 않고 사용 중 입니다</td>
-            </tr>
-            <tr>
-                <td>2025-02-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>, <@U08C89D9Q58|구본일>  경옥고실 교반탱크 배수 밸브 마모  발견시간 : 08시40분 경 발생장소...</td>
-            </tr>
-            <tr>
-                <td>2025-03-11</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08CZ3VTDEU|정재훈> 제조사측에서 지난 불량 히터 사진을 보고 과열 되었다고 하더라구요. 전류도 찍어보고 과열 될만한 상황 있을지 ...</td>
-            </tr>
-            <tr>
-                <td>2025-05-15</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08CAQW8Z9S|허라인> 청병(하) 진밤색 청병이 하얀 종이 먼지 ...</td>
-            </tr>
-            <tr>
-                <td>2025-05-15</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>불량은 따로 빼주시고 작업은 그대로 진행해주세요 사진에 나와있는 형태면 완전불량으로 빼야할것 같습니다 지금 들어갈게요</td>
-            </tr>
-            <tr>
-                <td>2025-05-24</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>*인쇄불량으로 인한 아이마크 인식오류발생 검은색 점(인쇄불량부위)을 아이마크로 인식해 롤당기는 동작이 일시정지되고 커팅동작 발생함 기계문제가 아...</td>
-            </tr>
-            <tr>
-                <td>2025-07-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>가로 접착 불량 6회 이며, 원물 에어 조정 및 공급 노즐 청소 후 현재 생산 진행 중 입니다</td>
-            </tr>
-            <tr>
-                <td>2025-11-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>업체에 문의결과 기온변화로 인한 필름이 수축되는 과정에서 발생한 공간으로 인해 벌어지는 부분이 위로 올라온거라고 하시네요.  재작업해서 보내주실...</td>
-            </tr>
-            <tr>
-                <td>2025-08-22</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> 위 라인님 말씀대로 위생상 이슈가 없고, 고객 입장에서 불편을 초래하는 이슈가 아니므로 정상 사용하도록 해주세...</td>
-            </tr>
-            <tr>
-                <td>2025-11-06</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>  인팩1  어제 작업분 컷팅 스틱포 하단 ...</td>
-            </tr>
-            <tr>
-                <td>2025-11-12</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>  발생일시 : 2025.11.12 발생시간...</td>
-            </tr>
-            <tr>
-                <td>2025-11-20</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>  발생일 : 11월20일 발생시간 : 16...</td>
-            </tr>
-            <tr>
-                <td>2025-12-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>  진성 작업중 갑자기 인쇄가 안된 스틱포가...</td>
-            </tr>
-            <tr>
-                <td>2026-02-20</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08F849KLSV|곽창원>  새로교체롤지도 울퉁불퉁 합니다. 그러나 ...</td>
-            </tr>
-            <tr>
-                <td>2026-02-20</td>
-                <td><span class="badge" style="background:#27ae60">낮음</span></td>
-                <td>현상확인을 위해 문제가 발생한 스틱포 롤지를 일부 잘라서 택배로 보낼 예정입니다. 오후에 방문하여 작업하겠습니다~</td>
-            </tr>
-            <tr>
-                <td>2025-10-01</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  <@U08C89D9Q58|구본일>  <@U08GARRS1ND|김용호>  롤지 잉크부분이 제대로 안 찍힙니다 ...</td>
-            </tr>
-            <tr>
-                <td>2025-10-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> 님, 작업 중 롤지 불량 확인 후 트러블슈팅 공유하고 롤지 교체 진행 후 작업 진행하고 있습니다.</td>
-            </tr>
-            <tr>
-                <td>2025-11-12</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> 1. 롤지 씹히는 문제     a. 롤지 위치를 잡아주는 가드에 걸려서 약간씩 씹히는 문제가 발생     b....</td>
-            </tr>
-            <tr>
-                <td>2026-02-27</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08F849KLSV|곽창원>  발생일: 2월27일 발생시간: 11:35...</td>
-            </tr>
-            <tr>
-                <td>2026-03-04</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U0AAZ60K3BN|박정현> <@U08D26P72JC|정진희> <@U08F849KLSV|곽창원> • 내용...</td>
-            </tr>
-            <tr>
-                <td>2025-06-17</td>
-                <td><span class="badge" style="background:#e74c3c">높음</span></td>
-                <td><@U07U0NDUDU4> <@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> ( <@U08D26NPP32|조영재> <@U08D...</td>
-            </tr>
-            <tr>
-                <td>2026-02-05</td>
-                <td><span class="badge" style="background:#e74c3c">높음</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> • 내용     ◦ 가로 접착 2번 온도가 내려가면서 1번 스틱에서 접착 불...</td>
-            </tr>
-            <tr>
-                <td>2026-02-23</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>진희님 안녕하세요! 우선 불량으로 제외 후 작업 부탁드리겠습니다.</td>
-            </tr></tbody>
-            </table>
-        </div>
-        <div class="card">
-            <h3>품질 불량 <span class="count-badge">24건</span></h3>
-            <table>
-                <thead><tr><th>날짜</th><th>심각도</th><th>내용</th></tr></thead>
-                <tbody>
-            <tr>
-                <td>2025-07-10</td>
-                <td><span class="badge" style="background:#e74c3c">높음</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08CDC3T01Y|이진경> <@U08F849KLSV|곽창원>  녹용 경옥고 스틱 터짐 밒 기계 부품 떨...</td>
-            </tr>
-            <tr>
-                <td>2025-08-05</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U091R9EL0AE>  총명 공진단 스틱 터짐 발생  발생시간 : 14:20 발생장소 : 내포장실 발생제...</td>
-            </tr>
-            <tr>
-                <td>2025-08-05</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>2차 총명 공진단 스틱 터짐 발생(1열) 19:05 터진 스틱포 및 가로 접착 불량 스틱 사무실 중앙 테이블에 놔두었습니다</td>
-            </tr>
-            <tr>
-                <td>2025-08-15</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U091R9EL0AE>  총명 공진단 스틱 터짐 발생  발생시간 : 11:10 발생장소 : 내포장실 발생제...</td>
-            </tr>
-            <tr>
-                <td>2025-02-20</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> 1관 내포장실 스틱 포장기 3열 링커팅모터 기어에 전선 물림 발생  발생시간 : 14시50분 경 발생장소 : ...</td>
-            </tr>
-            <tr>
-                <td>2025-03-19</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>, <@U08GARRS1ND|김용호> 스틱 포장기 3열 롤지 말려 올라가는 현상 발생  발견시간 : 16:20분...</td>
-            </tr>
-            <tr>
-                <td>2025-03-27</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>, <@U08GARRS1ND|김용호> 스틱 포장기 3열 롤지 울림 발생  발견시간 : 14:35~16:30분 경...</td>
-            </tr>
-            <tr>
-                <td>2025-04-09</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>, <@U08GARRS1ND|김용호> [소마 스틱 포장기 3열 롤지 울림 점검]  방문자 : 조진모 방문업체 :...</td>
-            </tr>
-            <tr>
-                <td>2025-05-23</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> 녹용 경옥고 스틱 터짐 발생  발생시간 : 18:44 발생장소 : 내포장실 ...</td>
-            </tr>
-            <tr>
-                <td>2025-05-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  스틱 포장기 3열 롤지 틀어짐, 아이마크 절단 발생  발생시간 : 13:40분 경 발생장소 : 내포장실 발생...</td>
-            </tr>
-            <tr>
-                <td>2025-07-11</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08CDC3T01Y|이진경> <@U08F849KLSV|곽창원>  녹용 경옥고 스틱 터짐 및 녹용 경옥고 ...</td>
-            </tr>
-            <tr>
-                <td>2025-08-05</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U091R9EL0AE>  총명 공진단 롤지 아이마크 끊어짐 발생  발생시간 : 12:20 발생장소 : 내포...</td>
-            </tr>
-            <tr>
-                <td>2025-08-14</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U091R9EL0AE>  스틱 포장기 5열 아이마크 절단 롤러 말림 현상 발생  발생시간 : 12:20 발...</td>
-            </tr>
-            <tr>
-                <td>2025-09-11</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U091R9EL0AE>  경옥고 스틱 절단부 불량 발생  발생시간 : 14:00 발생장소 : 내포장실 발생...</td>
-            </tr>
-            <tr>
-                <td>2025-05-15</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>기본적으로 품질관리가 되지 않고 있는 업체는 불량에 대하여 구두 경고만 하지 말고 문서로  방지 대책을 받고 추후 반복된다면 품질 불량 업체 관...</td>
-            </tr>
-            <tr>
-                <td>2025-09-12</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U091R9EL0AE>  경옥고 스틱 절단부 불량 발생</td>
-            </tr>
-            <tr>
-                <td>2025-09-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08CDC3T01Y|이진경> <@U08CDC3U79Q|하태경> cc <@U08F849KLSV|곽창원>  금박 프린팅이 고르지 못한 부분이 ...</td>
-            </tr>
-            <tr>
-                <td>2026-02-20</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>해당이슈 ASPT 품질팀에 먼저 전달드리고 다음주 방문시에 해당내용 바로 보고 받으실 수 있도록 준비해두겠습니다.</td>
-            </tr>
-            <tr>
-                <td>2026-03-04</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>ASPT 품질담당자와 소통진행중인데 필름텐션을 올려서 작업해도 동일한지 여쭤보시네요. <@U08D26P72JC|정진희> <@U08C89D9Q58...</td>
-            </tr>
-            <tr>
-                <td>2025-07-09</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호> <@U08CAQW8Z9S|허라인> <@U08F849KLSV|곽창원>  발생일...</td>
-            </tr>
-            <tr>
-                <td>2026-03-03</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일> <@U08F849KLSV|곽창원>  인팩2열 롤지 환터짐 롤지 불량 확인후 ...</td>
-            </tr>
-            <tr>
-                <td>2026-03-04</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>본일님, 해당문제 롤지가 고르지못해서 마킹기에 걸려 발생하는 문제일까요? 필요하다면 품질담당자님과 바로 소통할 예정입니다.</td>
-            </tr>
-            <tr>
-                <td>2025-08-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>8월20일 린필름지  입고 아이마크 절단불량입니다</td>
-            </tr>
-            <tr>
-                <td>2026-02-24</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  <@U08GARRS1ND|김용호>  <@U08C89D9Q58|구본일>  은교산 생산중에 스틱터짐이 많이 나왔...</td>
-            </tr></tbody>
-            </table>
-        </div>
-        <div class="card">
-            <h3>외관 불량 <span class="count-badge">17건</span></h3>
-            <table>
-                <thead><tr><th>날짜</th><th>심각도</th><th>내용</th></tr></thead>
-                <tbody>
-            <tr>
-                <td>2025-04-01</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BT9K1142|김동빈 - 컨설턴트> <@U08C60H9BU1|김영효 - 컨설턴트> 의사결정 필요합니다. 녹용경옥고, 경옥고 총 94,...</td>
-            </tr>
-            <tr>
-                <td>2025-06-06</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  중탕 교반기 자석봉에서 철가루 및 수세미 가닥 발견  발견시간 : 10:40분 경 발생장소 : 경옥고실 발생...</td>
-            </tr>
-            <tr>
-                <td>2025-05-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08CDC3T01Y|이진경>  까스퀵 롤지 곤충 이물질 발생  발견시간 : 17:10 발생장소 : 내포장...</td>
-            </tr>
-            <tr>
-                <td>2025-04-15</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>가려 제환기 주정 분사 불량건 보고 드립니다.  1. 상황 • 주정이 롤러에 골고루 도포되지 못함. 그에 따라 환이 롤러에서 떨어지지 않고 달라...</td>
-            </tr>
-            <tr>
-                <td>2025-05-12</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>이번건 까지 정리하여 업체측에 전달하겠습니다. 추후에 이물 발견 및 상태불량인게 발견되면 해당 지퍼백 확인 및 박스 확인 부탁드리고 보존해주시기...</td>
-            </tr>
-            <tr>
-                <td>2025-05-15</td>
-                <td><span class="badge" style="background:#e74c3c">높음</span></td>
-                <td><@U08J8GFM8V8|정일진> 앞으로 불량 발생시 처리 방법에 대한 기준(업체 교체 포함) 수립하여 관리하도록 하겠습니다.  아래는 초안에 ...</td>
-            </tr>
-            <tr>
-                <td>2025-07-07</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08F849KLSV|곽창원>  창원님, 토요일 추가로 발견된 청병(하) 진밤색 이물 불량 사진입니다</td>
-            </tr>
-            <tr>
-                <td>2025-07-22</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>해당 이슈로 불량이 발생하지는 않았을 것이라는 예상. 다만 지속적으로 이물질이 쌓인다면 불량을 야기할 수 있을 것이므로 실리콘패드 교체 필요 단...</td>
-            </tr>
-            <tr>
-                <td>2025-07-28</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현>  파머스에프 생지황즙 포장 찍힘으로 새어나옴 발생  발견시간 : 10:45 발생장소 : 탕전실 발생제품 : 파...</td>
-            </tr>
-            <tr>
-                <td>2025-08-25</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U091R9EL0AE>  파머스에프 생지황즙 포장지 찍힘으로 원물 새어나옴  발견시간 : 10:50 발생장...</td>
-            </tr>
-            <tr>
-                <td>2025-09-09</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U091R9EL0AE>  파머스에프 생지황즙 포장지 찍힘으로 원물 새어나옴  발견시간 : 10:20 발생장...</td>
-            </tr>
-            <tr>
-                <td>2025-06-26</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> cc <@U08C89D9Q58|구본일> 이지컷 점선이 연한건 괜찮다고 생각합니다. (상품으로 사용해도 무방으로...</td>
-            </tr>
-            <tr>
-                <td>2025-08-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08D26P72JC|정진희> cc <@U08C89D9Q58|구본일>  진희님, 스틱에 이물(먼지, 벌레 등)이 뭍어있어서 고객이 불쾌감을 ...</td>
-            </tr>
-            <tr>
-                <td>2025-10-02</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08C89D9Q58|구본일>   이물지로 인한 롤지 불량이 간간히 있습니다.</td>
-            </tr>
-            <tr>
-                <td>2025-05-29</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08C89D9Q58|구본일> <@U08GARRS1ND|김용호>  [핸드자키 및 슬라이딩 도어 불량] 발생일:25.5.29(목) 발생장소:2...</td>
-            </tr>
-            <tr>
-                <td>2025-06-26</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>린필름지자체 이물질 불량과 이지컷 점선이 연하게 인쇄되었습니다</td>
-            </tr>
-            <tr>
-                <td>2025-07-29</td>
-                <td><span class="badge" style="background:#e74c3c">높음</span></td>
-                <td>[차단기 고장건] <@U08GARRS1ND|김용호> <@U08C89D9Q58|구본일> <@U08BCPB7XMM|류재현>  •발생일:2025.7....</td>
-            </tr></tbody>
-            </table>
-        </div>
-        <div class="card">
-            <h3>납품/수량 이슈 <span class="count-badge">10건</span></h3>
-            <table>
-                <thead><tr><th>날짜</th><th>심각도</th><th>내용</th></tr></thead>
-                <tbody>
-            <tr>
-                <td>2025-03-21</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> <@U08BVP26WGP|정진호>  심지 짧은 롤지 2개 배송실에 놔뒀습니다</td>
-            </tr>
-            <tr>
-                <td>2025-05-16</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>기계작동 불량이 아닌 롤지 인쇄불량건 입니다 따로 빼주세요 수량 파악해서 업체측에 이야기 하겠습니다</td>
-            </tr>
-            <tr>
-                <td>2025-05-29</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08BVP26WGP|정진호>  녹용 경옥고 롤지 불량  녹용 경옥고 롤지 좌, 우로 울림이 있어 불량으로...</td>
-            </tr>
-            <tr>
-                <td>2026-01-13</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U093KBTQJ2F> 정원님 해당 불량 발생 롤지 지난해 6월 18일날 들어온 롤지인데요. 해당 로트 잔량이 18롤 정도 있는데 사용하다 ...</td>
-            </tr>
-            <tr>
-                <td>2026-01-13</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08F849KLSV|곽창원> 네네 해당 롤지 소진 후 최종 수량으로 전달하는걸로 하겠습니다. 이슈 lot제외 롤지 재고가 5개로 확인되는데...</td>
-            </tr>
-            <tr>
-                <td>2025-02-10</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>[보고] 2관 에어드라이어 고장건  날짜:2025.2.10  내용: 금일 에어드라이어 배출구에 대량의 에어가 새어나와 에어트랩 고장이라 판단  ...</td>
-            </tr>
-            <tr>
-                <td>2025-03-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>그리고, 사향라이트 발주차수, 불량 수량 정확하게 공유부탁드립니다</td>
-            </tr>
-            <tr>
-                <td>2025-03-18</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08F849KLSV|곽창원>  cc. <@U08CAQW8Z9S|허라인> 다음 발주때 불량 수량만큼 파악하여 더 해달라고 해주세요~</td>
-            </tr>
-            <tr>
-                <td>2025-03-24</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BVP26WGP|정진호> '심지 짧음' 롤은 외부창고에 보관 부탁드립니다. 불량 롤 일정수량 되면 지난번처럼 반품보낼게요</td>
-            </tr>
-            <tr>
-                <td>2026-01-06</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>[보고] 배송실 PC 파워 불량 건</td>
-            </tr></tbody>
-            </table>
-        </div>
-        <div class="card">
-            <h3>치수 불량 <span class="count-badge">4건</span></h3>
-            <table>
-                <thead><tr><th>날짜</th><th>심각도</th><th>내용</th></tr></thead>
-                <tbody>
-            <tr>
-                <td>2025-03-10</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BT9K1142|김동빈 - 컨설턴트> 롤지의 좌측, 우측의 길이가 확연히 차이나는 것이 보입니다. 이 경우 스틱의 디자인이 딱 정면에 ...</td>
-            </tr>
-            <tr>
-                <td>2025-09-12</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U07U0NDUDU4> <@U08BCPB7XMM|류재현> cc <@U091R9EL0AE>  절취선 불량인 스틱과 정상품 스틱 뜯어짐 문제가 ...</td>
-            </tr>
-            <tr>
-                <td>2025-09-30</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td>불량 발생한 상태의 아이마크 크기 자로 재어봐주세요</td>
-            </tr>
-            <tr>
-                <td>2025-10-01</td>
-                <td><span class="badge" style="background:#f39c12">중간</span></td>
-                <td><@U08BCPB7XMM|류재현> <@U08GARRS1ND|김용호> <@U091R9EL0AE> • 우리가 제공하는 도면의 아이마크 크기 : A ...</td>
-            </tr></tbody>
-            </table>
-        </div>
+        </tbody>
+    </table>
+</div>
 
-    <div class="footer">생성일시: 2026-03-04 14:15:09 &nbsp;|&nbsp; 키워드 기반 자동 분류</div>
+<p class="section-header">연도별·분기별 발생 추이</p>
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>기간</th>
+                <th>주요 불량</th>
+                <th>대표 이슈</th>
+                <th>건수</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>2025년 1Q</strong><br><small>(1~3월)</small></td>
+                <td>인쇄불량, 심지불량, 울림</td>
+                <td>롤지 좌우 길이 차이, 심지 짧음 연속, 업체 클레임 필요성 논의</td>
+                <td>12건</td>
+            </tr>
+            <tr>
+                <td><strong>2025년 2Q</strong><br><small>(4~6월)</small></td>
+                <td>인쇄불량, 이물질, 아이마크 오인식</td>
+                <td>생산 2시간 50분 중단(아이마크 오인식), 롤지 곤충 이물, ASPT 공식 컴플레인</td>
+                <td>14건</td>
+            </tr>
+            <tr>
+                <td><strong>2025년 3Q</strong><br><small>(7~9월)</small></td>
+                <td>아이마크 끊어짐, 인쇄불량</td>
+                <td>스틱 터짐 30~40포 수량 차이, 롤지 얇음으로 아이마크 끊어짐 반복</td>
+                <td>10건</td>
+            </tr>
+            <tr>
+                <td><strong>2025년 4Q</strong><br><small>(10~12월)</small></td>
+                <td>아이마크 인식오류, 잉크 뭍음</td>
+                <td>2관 아이마크 인식오류, 갈근탕 잉크 뭍음 신규 현상</td>
+                <td>6건</td>
+            </tr>
+            <tr>
+                <td><strong>2026년 1월</strong></td>
+                <td>인쇄불량(흰색선·실선)</td>
+                <td>2024-06 입고 로트 불량 확인, 23롤 교환 협의</td>
+                <td>3건</td>
+            </tr>
+            <tr style="background:#fff5f5;">
+                <td><strong>2026년 2~3월</strong><br><small style="color:#e74c3c">⚠ 급증</small></td>
+                <td>물리적 변형(구겨짐·컬링), 컷팅불량</td>
+                <td>긴급 처리 5열 롤지 대량 불량, 사이드 컬링 마킹기 걸림, ASPT 소통 중</td>
+                <td><strong style="color:#e74c3c">4건+</strong></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<p class="section-header">특이사항 및 참고</p>
+<div class="alert-box">
+    <strong>[업체 인정 사항]</strong> 2025-03-28 기준, 업체 담당자가 "롤지는 이 정도 불량은 항상 있으며, 심한 경우 48롤 1로트 중 24롤이 불량인 경우도 있다"고 발언. 불량 수량만큼 동수 교환(상계처리) 관행으로 운영 중.
+</div>
+<div class="alert-box">
+    <strong>[불량률 참고]</strong> 2025-05-02 기준, 1롤 기준 17,000포 생산 중 롤지 불량으로 인한 스틱 불량 발생 15~20포 수준으로 보고됨.
+</div>
+<div class="alert-box green">
+    <strong>[부자재 관리 기준서 수립]</strong> 2025-05-15 품질관리 담당 지시에 따라 공급사 선정 요건, 입고검사 기준, 부적합 관리 절차, 반복 불량 업체 교체 기준을 포함한 부자재 관리 기준서 초안 수립 착수.
+</div>
+
+<div class="footer">기준일: 2026-03-04 &nbsp;|&nbsp; Claude Code 자동 분석 (슬랙 메시지 기반)</div>
+
 </body>
 </html>
