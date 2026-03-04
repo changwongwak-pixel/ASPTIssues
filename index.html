@@ -1,700 +1,567 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ASPT 스틱포 롤지 불량 이력</title>
-  <style>
-    :root {
-      --primary: #1a3a5c;
-      --primary-light: #2d6a9f;
-      --accent: #e85d04;
-      --warn: #f48c06;
-      --warn-bg: #fff8e1;
-      --warn-border: #f48c06;
-      --section-bg: #f0f4f8;
-      --badge-unresolved: #dc2626;
-      --badge-resolved: #16a34a;
-      --badge-pending: #d97706;
-      --badge-analyzing: #2563eb;
-      --text: #1e293b;
-      --text-muted: #64748b;
-      --border: #cbd5e1;
-      --white: #ffffff;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-      font-size: 14px;
-      color: var(--text);
-      background: #eef2f7;
-      line-height: 1.7;
-    }
-
-    /* ── Header ── */
-    header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-      color: var(--white);
-      padding: 40px 48px 32px;
-    }
-
-    header h1 {
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 20px;
-    }
-
-    .meta-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 8px 24px;
-    }
-
-    .meta-item {
-      font-size: 13px;
-      opacity: 0.92;
-    }
-
-    .meta-item span {
-      font-weight: 600;
-      margin-right: 6px;
-      opacity: 0.75;
-    }
-
-    /* ── Layout ── */
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 32px 24px 64px;
-    }
-
-    /* ── TOC ── */
-    .toc {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 24px 28px;
-      margin-bottom: 32px;
-    }
-
-    .toc h2 {
-      font-size: 15px;
-      color: var(--primary);
-      margin-bottom: 12px;
-      font-weight: 700;
-    }
-
-    .toc ol {
-      padding-left: 20px;
-    }
-
-    .toc li {
-      margin-bottom: 4px;
-    }
-
-    .toc a {
-      color: var(--primary-light);
-      text-decoration: none;
-      font-size: 13px;
-    }
-
-    .toc a:hover { text-decoration: underline; }
-
-    .toc ul {
-      padding-left: 18px;
-      margin-top: 4px;
-    }
-
-    /* ── Section ── */
-    section {
-      background: var(--white);
-      border-radius: 10px;
-      padding: 28px 32px;
-      margin-bottom: 24px;
-      border: 1px solid var(--border);
-    }
-
-    section h2 {
-      font-size: 18px;
-      color: var(--primary);
-      font-weight: 700;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid var(--primary);
-    }
-
-    section h3 {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--primary-light);
-      margin: 28px 0 14px;
-      padding: 8px 14px;
-      background: var(--section-bg);
-      border-left: 4px solid var(--primary-light);
-      border-radius: 0 6px 6px 0;
-    }
-
-    section h3:first-of-type { margin-top: 8px; }
-
-    /* ── Tables ── */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      margin-bottom: 8px;
-    }
-
-    thead tr {
-      background: var(--primary);
-      color: var(--white);
-    }
-
-    thead th {
-      padding: 10px 14px;
-      text-align: left;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    tbody tr:nth-child(even) { background: #f8fafc; }
-    tbody tr:hover { background: #edf4ff; }
-
-    tbody td {
-      padding: 9px 14px;
-      border-bottom: 1px solid #e8edf3;
-      vertical-align: top;
-    }
-
-    .date-cell {
-      white-space: nowrap;
-      font-weight: 600;
-      color: var(--primary);
-      font-size: 12px;
-    }
-
-    .channel-cell {
-      white-space: nowrap;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    /* ── Badges ── */
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 99px;
-      font-size: 11px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .badge-red    { background: #fee2e2; color: var(--badge-unresolved); }
-    .badge-green  { background: #dcfce7; color: var(--badge-resolved); }
-    .badge-yellow { background: #fef9c3; color: #a16207; }
-    .badge-blue   { background: #dbeafe; color: var(--badge-analyzing); }
-    .badge-gray   { background: #f1f5f9; color: #475569; }
-
-    /* ── Warning box ── */
-    .alert {
-      background: var(--warn-bg);
-      border: 1px solid var(--warn-border);
-      border-left: 4px solid var(--accent);
-      border-radius: 6px;
-      padding: 12px 16px;
-      margin: 14px 0;
-      font-size: 13px;
-      color: #78350f;
-    }
-
-    .alert strong { color: var(--accent); }
-
-    /* ── Note box ── */
-    .note {
-      background: #f0f4ff;
-      border: 1px solid #c7d2fe;
-      border-left: 4px solid var(--primary-light);
-      border-radius: 6px;
-      padding: 10px 14px;
-      font-size: 12.5px;
-      color: #3730a3;
-      margin: 8px 0 16px;
-    }
-
-    /* ── Special items list ── */
-    .special-list {
-      list-style: none;
-      padding: 0;
-    }
-
-    .special-list li {
-      padding: 14px 16px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      background: var(--section-bg);
-      border-left: 4px solid var(--primary-light);
-      font-size: 13.5px;
-    }
-
-    .special-list li strong {
-      display: block;
-      color: var(--primary);
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
-
-    .special-list li:nth-child(2) { border-left-color: var(--accent); }
-    .special-list li:nth-child(2) strong { color: var(--accent); }
-
-    /* ── Sub-list in table cell ── */
-    .sub-list {
-      list-style: none;
-      padding: 0;
-      margin: 4px 0 0;
-    }
-
-    .sub-list li {
-      padding: 2px 0 2px 12px;
-      position: relative;
-      font-size: 12.5px;
-      color: var(--text);
-    }
-
-    .sub-list li::before {
-      content: "▸";
-      position: absolute;
-      left: 0;
-      color: var(--primary-light);
-      font-size: 11px;
-      top: 3px;
-    }
-
-    /* ── Bold in td ── */
-    td strong { color: var(--primary); }
-
-    /* ── Footer ── */
-    footer {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 12px;
-      padding-bottom: 24px;
-    }
-
-    @media (max-width: 700px) {
-      header { padding: 24px 20px; }
-      section { padding: 20px 16px; }
-      thead th, tbody td { padding: 8px 10px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASPT 스틱포 롤지 불량 이력</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            padding: 24px;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .header h1 { font-size: 22px; margin-bottom: 10px; }
+        .header .meta { opacity: 0.75; font-size: 13px; line-height: 2; }
+        .header .meta span { margin-right: 24px; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .stat .num { font-size: 36px; font-weight: bold; color: #1a1a2e; }
+        .stat .num.red { color: #e74c3c; }
+        .stat .num.orange { color: #e67e22; }
+        .stat .lbl { font-size: 13px; color: #888; margin-top: 4px; }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a1a2e;
+            margin: 28px 0 12px;
+            padding-left: 10px;
+            border-left: 4px solid #1a1a2e;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card h3 {
+            font-size: 15px;
+            margin-bottom: 14px;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .period-badge {
+            background: #e8eaf6;
+            color: #3949ab;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th {
+            text-align: left;
+            padding: 8px 12px;
+            background: #f7f7f7;
+            color: #666;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+        td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: top; line-height: 1.6; }
+        tr:last-child td { border-bottom: none; }
+        .badge {
+            display: inline-block;
+            color: white;
+            padding: 2px 9px;
+            border-radius: 10px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .badge-red { background: #e74c3c; }
+        .badge-orange { background: #e67e22; }
+        .badge-green { background: #27ae60; }
+        .badge-gray { background: #95a5a6; }
+        .badge-blue { background: #2980b9; }
+        .warning-box {
+            background: #fff8e1;
+            border-left: 4px solid #f39c12;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0;
+            font-size: 13px;
+            color: #7d5a00;
+            line-height: 1.6;
+        }
+        .special-items { list-style: none; }
+        .special-items li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .special-items li:last-child { border-bottom: none; }
+        .special-items li strong { color: #1a1a2e; }
+        .num-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #1a1a2e;
+            color: white;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        .footer {
+            text-align: center;
+            color: #aaa;
+            font-size: 12px;
+            margin-top: 28px;
+        }
+        @media (max-width: 768px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            body { padding: 12px; }
+        }
+    </style>
 </head>
 <body>
 
-<header>
-  <h1>ASPT 스틱포 롤지 불량 이력</h1>
-  <div class="meta-grid">
-    <div class="meta-item"><span>업체</span>ASPT (구 아성산업)</div>
-    <div class="meta-item"><span>주소</span>경북 영천시 금호읍 영천산단로 172 (구암리 1332-4)</div>
-    <div class="meta-item"><span>연락처</span>054-336-0701 / FAX 054-336-0702</div>
-    <div class="meta-item"><span>담당자</span>구경모 과장 (품질팀) 010-9298-8628</div>
-    <div class="meta-item"><span>문서 기준일</span>2026-03-03</div>
-  </div>
-</header>
-
-<div class="container">
-
-  <!-- TOC -->
-  <div class="toc">
-    <h2>목차</h2>
-    <ol>
-      <li><a href="#section1">불량 유형별 요약</a></li>
-      <li><a href="#section2">연도별 불량 이력</a>
-        <ul>
-          <li><a href="#p1">2025년 2~3월 — 초기 불량 발견</a></li>
-          <li><a href="#p2">2025년 3월 말~4월 — 불량 전수 파악 및 대량 반품</a></li>
-          <li><a href="#p3">2025년 5~6월 — 품질 신뢰도 붕괴</a></li>
-          <li><a href="#p4">2025년 7~8월 — 업체 변경 요청 및 반복 반품</a></li>
-          <li><a href="#p5">2025년 10~11월 — 누액 이슈 및 구조적 문제 제기</a></li>
-          <li><a href="#p6">2026년 2~3월 — 불량 재증가 및 현장 방문</a></li>
-        </ul>
-      </li>
-      <li><a href="#section3">대응 현황 요약</a></li>
-      <li><a href="#section4">특이사항</a></li>
-    </ol>
-  </div>
-
-  <!-- Section 1 -->
-  <section id="section1">
-    <h2>1. 불량 유형별 요약</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>불량 유형</th>
-          <th>해당 품목</th>
-          <th>최초 발생</th>
-          <th>대응 상태</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>심지·감김 불량 (단차, 흐트러짐)</td>
-          <td>녹용경옥고, 경옥고</td>
-          <td class="date-cell">2025-03</td>
-          <td><span class="badge badge-red">반복 반품/재작업 (미해결)</span></td>
-        </tr>
-        <tr>
-          <td>인쇄 불량 (사선·이물 끼임)</td>
-          <td>경옥고, 녹용경옥고</td>
-          <td class="date-cell">2025-03</td>
-          <td><span class="badge badge-green">반품 교환</span></td>
-        </tr>
-        <tr>
-          <td>아이마크 편차·잉크 번짐</td>
-          <td>린다이어트, 녹용경옥고</td>
-          <td class="date-cell">2025-03</td>
-          <td><span class="badge badge-green">반품</span></td>
-        </tr>
-        <tr>
-          <td>롤폭 비대칭·좌우 커팅면 편차</td>
-          <td>린 데일리, 린 다이어트</td>
-          <td class="date-cell">2025-03</td>
-          <td><span class="badge badge-green">반품</span></td>
-        </tr>
-        <tr>
-          <td>컷팅 꼬리 잔류·분진 발생</td>
-          <td>린 스틱포</td>
-          <td class="date-cell">2025-02</td>
-          <td><span class="badge badge-red">개선 요청 (미해결)</span></td>
-        </tr>
-        <tr>
-          <td>오물·얼룩자국</td>
-          <td>린다이어트, 녹용경옥고 재작업분</td>
-          <td class="date-cell">2025-08</td>
-          <td><span class="badge badge-yellow">컴플레인</span></td>
-        </tr>
-        <tr>
-          <td>누액(리크) — 이지컷 구멍</td>
-          <td>상비약 (콜드퀵, 까스퀵)</td>
-          <td class="date-cell">2025-02</td>
-          <td><span class="badge badge-blue">원인 분석 중</span></td>
-        </tr>
-        <tr>
-          <td>잔량 롤 (500m 미달 납품)</td>
-          <td>다이어트 외 전 품목</td>
-          <td class="date-cell">2025-11</td>
-          <td><span class="badge badge-yellow">비용 협의 필요</span></td>
-        </tr>
-        <tr>
-          <td>내면 우글거림</td>
-          <td>린 스틱포</td>
-          <td class="date-cell">2026-02</td>
-          <td><span class="badge badge-green">교환 대상</span></td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- Section 2 -->
-  <section id="section2">
-    <h2>2. 연도별 불량 이력</h2>
-
-    <h3 id="p1">2025년 2~3월 — 초기 불량 발견</h3>
-    <table>
-      <thead>
-        <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="date-cell">2025-02-06</td>
-          <td class="channel-cell">게시금지_메디스트림원외탕전_생산관리</td>
-          <td>상비약 스틱포롤 <strong>리크 이슈</strong> — 세로선(배접) 부분 물방울 새어나옴. 롤지 두께 또는 접착 문제 의심</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-02-19</td>
-          <td class="channel-cell">생산관리_컨설팅</td>
-          <td>변경된 상비약 스틱포 롤지 입고 예정, 리크 테스트 계획</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-03-07</td>
-          <td class="channel-cell">제1원외탕전_트러블슈팅</td>
-          <td><strong>(구)경옥고 롤지</strong> 좌측면이 너무 짧아 스틱 디자인 틀어짐 → 롤 교체 후 재개, 당일 롤지불량 <strong>359포</strong> 발생</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-03-10</td>
-          <td class="channel-cell">제1원외탕전_트러블슈팅</td>
-          <td>롤지 좌우 길이 편차 확인 — 기계 조정만으로는 한계, 롤지 자체 문제</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-03-12</td>
-          <td class="channel-cell">제2원외탕전_생산팀_업무</td>
-          <td>ASPT 김진덕 본부장 설명: 신규 롤지는 <strong>4중지, PP→PE 재질 변경</strong> (PE 내열 105도, 고온 살균·장기 보관 주의)</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-03-28</td>
-          <td class="channel-cell">제1원외탕전_트러블슈팅</td>
-          <td><strong>(구)경옥고 롤지 인쇄 불량</strong> 발생 → 롤 교체 후 재개, 당일 롤지불량 <strong>120포</strong> 발생</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3 id="p2">2025년 3월 말~4월 — 불량 전수 파악 및 대량 반품</h3>
-    <table>
-      <thead>
-        <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="date-cell">2025-03-31</td>
-          <td class="channel-cell">제1원외탕전_생산팀_업무</td>
-          <td>보유 불량 롤 현황 공유: <strong>린 스틱포 6롤</strong> (구겨짐·먼지·아이마크 불량), <strong>데일리 4롤</strong> (폭 좁음·비대칭)</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-04-01</td>
-          <td class="channel-cell">생산관리_컨설팅</td>
-          <td>
-            창고 전수조사 결과 — 총 반품 대상:
-            <ul class="sub-list">
-              <li>경옥고 롤지: 심지/감김 불량 <strong>4개</strong> + 인쇄불량 <strong>1개</strong></li>
-              <li>녹용경옥고 롤지: 심지/감김 불량 <strong>5개</strong></li>
-              <li>린 데일리 롤: 아이마커 간격·롤폭 불량 <strong>4개</strong></li>
-              <li>린 다이어트 롤: 아이마커 간격·롤폭 불량 <strong>4개</strong></li>
-            </ul>
-          </td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-04-11</td>
-          <td class="channel-cell">생산관리_컨설팅</td>
-          <td>ASPT에 3열·5열 포장지 개선 요청 공식 전달</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-04-17</td>
-          <td class="channel-cell">생산관리_컨설팅</td>
-          <td><strong>총 27개 반품</strong> 처리: 녹용경옥고 19개 + 콜드퀵 8개 (인쇄불량 1, 심지+감김불량 5, 심지불량 19, 기타 2) → 재작업 후 입고 요청</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-04-28</td>
-          <td class="channel-cell">—</td>
-          <td>4/8 입고 25롤 → 4/18 불량 19롤 출고 → 4/28 <strong>재작업 없이 불량 표기 그대로 재입고됨</strong></td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="alert">
-      <strong>⚠️ 4월 28일 사건</strong>: ASPT가 재작업 없이 불량 롤을 그대로 돌려보낸 것이 확인됨. 품질관리 신뢰도에 심각한 문제 제기됨.
+<div class="header">
+    <h1>ASPT 스틱포 롤지 불량 이력</h1>
+    <div class="meta">
+        <span>업체: ASPT (구 아성산업)</span>
+        <span>소재지: 경북 영천시 금호읍 영천산단로 172</span><br>
+        <span>연락처: 054-336-0701 / FAX 054-336-0702</span>
+        <span>담당자: 구경모 과장 (품질팀) 010-9298-8628</span>
+        <span>문서 기준일: 2026-03-04</span>
     </div>
-
-    <h3 id="p3">2025년 5~6월 — 품질 신뢰도 붕괴</h3>
-    <table>
-      <thead>
-        <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="date-cell">2025-06-02</td>
-          <td class="channel-cell">산청manu_업무공유 (DM)</td>
-          <td>외부창고 녹용경옥고 불량 <strong>9개 추가 발견</strong> → 사용 가능 수량 <strong>1개만 남음</strong> (심각한 재고 위기)</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-06-02</td>
-          <td class="channel-cell">산청manu_업무공유 (DM)</td>
-          <td>ASPT가 <strong>자체 생산이 아닌 외주 제작</strong> 방식으로 납품 중 확인. 교환 요청 롤에 오히려 더 심한 불량 발생. 전체 검수 미실시. 업체 변경 목소리 내부 확산</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-06-04</td>
-          <td class="channel-cell">생산관리_컨설팅</td>
-          <td>동빈님 ASPT 통화 — 재작업분 일괄 출고 구조라 일부 선납 불가, 6/18까지 재확인 예정</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3 id="p4">2025년 7~8월 — 업체 변경 요청 및 반복 반품</h3>
-    <table>
-      <thead>
-        <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="date-cell">2025-07-11</td>
-          <td class="channel-cell">생산관리_컨설팅</td>
-          <td><strong>류재현: ASPT 말고 다른 업체로 변경 공식 요청</strong> — ① 녹용경옥고 좌우 커팅면 심각한 편차 ② 아이마크면 잉크 번짐 ③ 린다이어트 롤 오물 다수</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-07-11</td>
-          <td class="channel-cell">생산관리_컨설팅</td>
-          <td>이소리(디자인): "ASPT는 규모 큰 업체, 갑자기 왜 문제가 심해졌는지 원인 파악 필요. 변경 시 피해 보상도 요구해야"</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-07-15</td>
-          <td class="channel-cell">생산관리_컨설팅</td>
-          <td>입고 검사 미실시로 불량 관련 공식 문서 없음 확인</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-07-22</td>
-          <td class="channel-cell">제1원외탕전_물류</td>
-          <td>녹용경옥고 5열 스틱포롤 <strong>안전재고 8개 제외 전량 반품</strong> (재작업 의뢰, 경동택배 착불)</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-08-04</td>
-          <td class="channel-cell">부자재-구매협력</td>
-          <td>ASPT 교환 요청분 택배 발송 확인</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-08-19</td>
-          <td class="channel-cell">산청manu_업무공유 (DM)</td>
-          <td>다이어트 스틱포롤 현장 22개 남음 (목요일까지만 사용 가능) → 긴급 선입고 요청</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-08-21</td>
-          <td class="channel-cell">제2원외탕전_트러블슈팅</td>
-          <td>스틱포롤 <strong>컷팅 꼬투리 잔류</strong> — 아이마크 영역이 그만큼 줄어 불량 가능성 증가, 제작업체 컴플레인 예정</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-08-28</td>
-          <td class="channel-cell">산청manu_업무공유 (DM)</td>
-          <td>재작업 롤(단차·감김 불량 처리분)에서 <strong>얼룩자국 간헐적 발견</strong>. 다이어트 96개 입고 중 2개가 <strong>450m (정규 500m 미달)</strong></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3 id="p5">2025년 10~11월 — 누액 이슈 및 구조적 문제 제기</h3>
-    <table>
-      <thead>
-        <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="date-cell">2025-10-13</td>
-          <td class="channel-cell">품질논의</td>
-          <td>스틱포장기 최적 세팅값 탐색 + <strong>더 두껍고 접착력 좋은 재질 조사</strong> 필요성 논의</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-11-07</td>
-          <td class="channel-cell">office_행정총무</td>
-          <td><strong>잔량 롤 문제 공식 제기</strong> — 불량 구간 제거 후 잔량 롤 발생(예: 245m), 이어붙인 구간 통과 시 스틱 불량(파손·눌림) 필연 발생 → 비용 협의 필요</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-11-20</td>
-          <td class="channel-cell">제2원외탕전_품의</td>
-          <td>ASPT에서 <strong>투명무지롤 제공 → 누액 원인 분석</strong> 예정. 소마팩(기계업체)과 협력하여 기계 점검 병행</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2025-11-27</td>
-          <td class="channel-cell">산청2호점-cs</td>
-          <td>은교산 스틱 접착 불량 — 10/29 이후 개선 시도 중. <strong>롤밀기 이용 2차 검수(접착불량 선별)</strong> 도입 예정, 출고 후 불량 발견 건 1/10 수준 감소 기대</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3 id="p6">2026년 2~3월 — 불량 재증가 및 현장 방문</h3>
-    <table>
-      <thead>
-        <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="date-cell">2026-02-06</td>
-          <td class="channel-cell">제2원외탕전_트러블슈팅</td>
-          <td>인팩 5열 <strong>커팅 불량</strong> — 스틱 꼬리가 매끄럽지 않음</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2026-02-20</td>
-          <td class="channel-cell">산청manu_업무공유</td>
-          <td>ASPT 방문 전 불량 브리핑 내용 정리 (곽창원)</td>
-        </tr>
-        <tr>
-          <td class="date-cell">2026-02-27</td>
-          <td class="channel-cell">생산관리_컨설팅</td>
-          <td>
-            <strong>ASPT 현장 방문 미팅</strong> (도지미 이사, 김진덕 본부장 대응):
-            <ul class="sub-list">
-              <li><strong>린 스틱포 롤</strong>: 내면 우글거림(교환), 바깥면 사선(합지 불량·개선요청), 분진(LOT별 추적 필요), 컷팅 꼬리(ASPT 측 불량 인정 거부), 아이마크 편차(교환)</li>
-              <li><strong>경옥고·총명공진단</strong>: 인쇄 이물 불량 → 교환 진행</li>
-              <li><strong>사탕포장지</strong>: 가이드선 컷팅 실패로 검은 라인 발생 → 교환 진행</li>
-              <li><strong>총명공진단 스틱포 롤</strong>: 단층 발생 (롤 감김 저항 낮아 내부 빠져나옴) → 교환</li>
-            </ul>
-          </td>
-        </tr>
-        <tr>
-          <td class="date-cell">2026-03-03</td>
-          <td class="channel-cell">제2원외탕전_트러블슈팅</td>
-          <td>불량 이슈 보고 증가 → <strong>ASPT 불량 전용 스레드 신설</strong></td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- Section 3 -->
-  <section id="section3">
-    <h2>3. 대응 현황 요약</h2>
-    <table>
-      <thead>
-        <tr><th>대응 방식</th><th>내용</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>반품·재작업</strong></td>
-          <td>2025년 4월, 7월 대규모 반품 진행. 단, ASPT가 재작업 없이 그대로 재납품하는 사례 발생</td>
-        </tr>
-        <tr>
-          <td><strong>현장 방문</strong></td>
-          <td>2026-02-27 ASPT 공장 방문 미팅. 불량 유형별 원인 설명 청취 및 교환·개선 요청</td>
-        </tr>
-        <tr>
-          <td><strong>업체 변경 요청</strong></td>
-          <td>2025-07-11 공식 변경 요청 → 현재(2026-03)까지 ASPT와 거래 지속 중</td>
-        </tr>
-        <tr>
-          <td><strong>내부 검수 강화</strong></td>
-          <td>롤밀기 2차 검수 도입 예정 (접착 불량 선별), 입고 검사 체계 미비 상태</td>
-        </tr>
-        <tr>
-          <td><strong>소재 분석</strong></td>
-          <td>ASPT 제공 투명무지롤로 누액 원인 분석 중 (소마팩 협력)</td>
-        </tr>
-        <tr>
-          <td><strong>비용 협의</strong></td>
-          <td>잔량 롤·불량 롤에 대한 비용 차감/협의 일부 진행, 전면 합의는 미완</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- Section 4 -->
-  <section id="section4">
-    <h2>4. 특이사항</h2>
-    <ul class="special-list">
-      <li>
-        <strong>① ASPT 외주 제작 문제</strong>
-        ASPT가 자체 생산이 아닌 외주 제작으로 납품 중임이 확인됨. 전체 검수가 이루어지지 않고 있어 품질 일관성 보장 불가.
-      </li>
-      <li>
-        <strong>② 재작업 미이행</strong>
-        2025년 4월, 불량 반품 후 재작업 없이 불량 표기 그대로 재납품한 사실 확인됨.
-      </li>
-      <li>
-        <strong>③ 재질 변경 이력</strong>
-        2025년 3월, PP 재질에서 PE 재질로 변경. PE는 내열 105도로 고온 살균(끓는 물) 불가, 겨울 생산품 품질 편차 큼.
-      </li>
-      <li>
-        <strong>④ 롤 보관 주의사항</strong>
-        최대 <strong>6개월 이내</strong> 사용 권장. 장기 보관 시 유분 발생, 롤 감김 저항 저하로 내부 빠짐 현상 발생 가능.
-      </li>
-      <li>
-        <strong>⑤ 입고 검사 체계 부재</strong>
-        스틱포 롤은 입고 검사 미실시. 불량 문서 기록 없음 (2025-07-15 확인). 체계 수립 필요.
-      </li>
-      <li>
-        <strong>⑥ 업체 변경 미진행</strong>
-        2025년 7월 공식 변경 요청 이후에도 대안 업체 미확정 상태로 ASPT 거래 지속 중.
-      </li>
-    </ul>
-  </section>
-
 </div>
 
-<footer>
-  문서 기준일: 2026-03-03 &nbsp;|&nbsp; Slack 메시지 기반 정리
-</footer>
+<div class="stats">
+    <div class="stat">
+        <div class="num">9</div>
+        <div class="lbl">불량 유형</div>
+    </div>
+    <div class="stat">
+        <div class="num">6</div>
+        <div class="lbl">관련 시기</div>
+    </div>
+    <div class="stat">
+        <div class="num red">27+</div>
+        <div class="lbl">총 반품 롤 수</div>
+    </div>
+    <div class="stat">
+        <div class="num orange">미해결</div>
+        <div class="lbl">업체 변경 여부</div>
+    </div>
+</div>
+
+<!-- 불량 유형별 요약 -->
+<div class="section-title">1. 불량 유형별 요약</div>
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>불량 유형</th>
+                <th>해당 품목</th>
+                <th>최초 발생</th>
+                <th>대응 상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>심지·감김 불량 (단차, 흐트러짐)</td>
+                <td>녹용경옥고, 경옥고</td>
+                <td>2025-03</td>
+                <td><span class="badge badge-red">반복 반품/재작업 (미해결)</span></td>
+            </tr>
+            <tr>
+                <td>인쇄 불량 (사선·이물 끼임)</td>
+                <td>경옥고, 녹용경옥고</td>
+                <td>2025-03</td>
+                <td><span class="badge badge-orange">반품 교환</span></td>
+            </tr>
+            <tr>
+                <td>아이마크 편차·잉크 번짐</td>
+                <td>린다이어트, 녹용경옥고</td>
+                <td>2025-03</td>
+                <td><span class="badge badge-orange">반품</span></td>
+            </tr>
+            <tr>
+                <td>롤폭 비대칭·좌우 커팅면 편차</td>
+                <td>린 데일리, 린 다이어트</td>
+                <td>2025-03</td>
+                <td><span class="badge badge-orange">반품</span></td>
+            </tr>
+            <tr>
+                <td>컷팅 꼬리 잔류·분진 발생</td>
+                <td>린 스틱포</td>
+                <td>2025-02</td>
+                <td><span class="badge badge-red">개선 요청 (미해결)</span></td>
+            </tr>
+            <tr>
+                <td>오물·얼룩자국</td>
+                <td>린다이어트, 녹용경옥고 재작업분</td>
+                <td>2025-08</td>
+                <td><span class="badge badge-orange">컴플레인</span></td>
+            </tr>
+            <tr>
+                <td>누액(리크) — 이지컷 구멍</td>
+                <td>상비약 (콜드퀵, 까스퀵)</td>
+                <td>2025-02</td>
+                <td><span class="badge badge-gray">원인 분석 중</span></td>
+            </tr>
+            <tr>
+                <td>잔량 롤 (500m 미달 납품)</td>
+                <td>다이어트 외 전 품목</td>
+                <td>2025-11</td>
+                <td><span class="badge badge-gray">비용 협의 필요</span></td>
+            </tr>
+            <tr>
+                <td>내면 우글거림</td>
+                <td>린 스틱포</td>
+                <td>2026-02</td>
+                <td><span class="badge badge-orange">교환 대상</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 연도별 불량 이력 -->
+<div class="section-title">2. 연도별 불량 이력</div>
+
+<!-- 2025년 2~3월 -->
+<div class="card">
+    <h3>2025년 2~3월 <span class="period-badge">초기 불량 발견</span></h3>
+    <table>
+        <thead>
+            <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="white-space:nowrap">2025-02-06</td>
+                <td style="white-space:nowrap;color:#666;font-size:13px">메디스트림_생산관리</td>
+                <td>상비약 스틱포롤 <strong>리크 이슈</strong> — 세로선(배접) 부분 물방울 새어나옴. 롤지 두께 또는 접착 문제 의심</td>
+            </tr>
+            <tr>
+                <td>2025-02-19</td>
+                <td style="color:#666;font-size:13px">생산관리_컨설팅</td>
+                <td>변경된 상비약 스틱포 롤지 입고 예정, 리크 테스트 계획</td>
+            </tr>
+            <tr>
+                <td>2025-03-07</td>
+                <td style="color:#666;font-size:13px">제1원외탕전_트러블슈팅</td>
+                <td>경옥고 롤지 좌측면이 너무 짧아 스틱 디자인 틀어짐 → 롤 교체 후 재개, 당일 롤지불량 <strong>359포</strong> 발생</td>
+            </tr>
+            <tr>
+                <td>2025-03-10</td>
+                <td style="color:#666;font-size:13px">제1원외탕전_트러블슈팅</td>
+                <td>롤지 좌우 길이 편차 확인 — 기계 조정만으로는 한계, 롤지 자체 문제</td>
+            </tr>
+            <tr>
+                <td>2025-03-12</td>
+                <td style="color:#666;font-size:13px">제2원외탕전_생산팀_업무</td>
+                <td>ASPT 김진덕 본부장 설명: 신규 롤지는 <strong>4중지, PP→PE 재질 변경</strong> (PE 내열 105도, 고온 살균·장기 보관 주의)</td>
+            </tr>
+            <tr>
+                <td>2025-03-28</td>
+                <td style="color:#666;font-size:13px">제1원외탕전_트러블슈팅</td>
+                <td>경옥고 롤지 인쇄 불량 발생 → 롤 교체 후 재개, 당일 롤지불량 <strong>120포</strong> 발생</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 2025년 3월 말~4월 -->
+<div class="card">
+    <h3>2025년 3월 말~4월 <span class="period-badge">불량 전수 파악 및 대량 반품</span></h3>
+    <table>
+        <thead>
+            <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="white-space:nowrap">2025-03-31</td>
+                <td style="color:#666;font-size:13px">제1원외탕전_생산팀_업무</td>
+                <td>보유 불량 롤 현황 공유: 린 스틱포 <strong>6롤</strong> (구겨짐·먼지·아이마크 불량), 데일리 <strong>4롤</strong> (폭 좁음·비대칭)</td>
+            </tr>
+            <tr>
+                <td>2025-04-01</td>
+                <td style="color:#666;font-size:13px">생산관리_컨설팅</td>
+                <td>
+                    창고 전수조사 결과 — 총 반품 대상 집계:<br>
+                    ▸ 경옥고 롤지: 심지/감김 불량 <strong>4개</strong> + 인쇄불량 <strong>1개</strong><br>
+                    ▸ 녹용경옥고 롤지: 심지/감김 불량 <strong>5개</strong><br>
+                    ▸ 린 데일리 롤: 아이마커 간격·롤폭 불량 <strong>4개</strong><br>
+                    ▸ 린 다이어트 롤: 아이마커 간격·롤폭 불량 <strong>4개</strong>
+                </td>
+            </tr>
+            <tr>
+                <td>2025-04-11</td>
+                <td style="color:#666;font-size:13px">생산관리_컨설팅</td>
+                <td>ASPT에 3열·5열 포장지 개선 요청 공식 전달</td>
+            </tr>
+            <tr>
+                <td>2025-04-17</td>
+                <td style="color:#666;font-size:13px">생산관리_컨설팅</td>
+                <td>총 <strong>27개 반품</strong> 처리: 녹용경옥고 19개 + 콜드퀵 8개 (인쇄불량 1, 심지+감김불량 5, 심지불량 19, 기타 2) → 재작업 후 입고 요청</td>
+            </tr>
+            <tr>
+                <td>2025-04-28</td>
+                <td style="color:#666;font-size:13px">—</td>
+                <td>4/8 입고 25롤 → 4/18 불량 19롤 출고 → 4/28 <strong>재작업 없이 불량 표기 그대로 재입고됨</strong></td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="warning-box">
+        ⚠️ <strong>4월 28일 사건</strong>: ASPT가 재작업 없이 불량 롤을 그대로 돌려보낸 것이 확인됨. 품질관리 신뢰도에 심각한 문제 제기됨.
+    </div>
+</div>
+
+<!-- 2025년 5~6월 -->
+<div class="card">
+    <h3>2025년 5~6월 <span class="period-badge">품질 신뢰도 붕괴</span></h3>
+    <table>
+        <thead>
+            <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="white-space:nowrap">2025-06-02</td>
+                <td style="color:#666;font-size:13px">산청manu_업무공유</td>
+                <td>외부창고 녹용경옥고 불량 <strong>9개 추가 발견</strong> → 사용 가능 수량 <strong>1개만 남음</strong> (심각한 재고 위기)</td>
+            </tr>
+            <tr>
+                <td>2025-06-02</td>
+                <td style="color:#666;font-size:13px">산청manu_업무공유</td>
+                <td>ASPT가 <strong>자체 생산이 아닌 외주 제작</strong> 방식으로 납품 중 확인. 교환 요청 롤에 오히려 더 심한 불량 발생. 전체 검수 미실시. 업체 변경 목소리 내부 확산</td>
+            </tr>
+            <tr>
+                <td>2025-06-04</td>
+                <td style="color:#666;font-size:13px">생산관리_컨설팅</td>
+                <td>동빈님 ASPT 통화 — 재작업분 일괄 출고 구조라 일부 선납 불가, 6/18까지 재확인 예정</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 2025년 7~8월 -->
+<div class="card">
+    <h3>2025년 7~8월 <span class="period-badge">업체 변경 요청 및 반복 반품</span></h3>
+    <table>
+        <thead>
+            <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="white-space:nowrap">2025-07-11</td>
+                <td style="color:#666;font-size:13px">생산관리_컨설팅</td>
+                <td><strong>류재현: ASPT 말고 다른 업체로 변경 공식 요청</strong> — ① 녹용경옥고 좌우 커팅면 심각한 편차 ② 아이마크면 잉크 번짐 ③ 린다이어트 롤 오물 다수</td>
+            </tr>
+            <tr>
+                <td>2025-07-11</td>
+                <td style="color:#666;font-size:13px">생산관리_컨설팅</td>
+                <td>이소리(디자인): "ASPT는 규모 큰 업체, 갑자기 왜 문제가 심해졌는지 원인 파악 필요. 변경 시 피해 보상도 요구해야"</td>
+            </tr>
+            <tr>
+                <td>2025-07-15</td>
+                <td style="color:#666;font-size:13px">생산관리_컨설팅</td>
+                <td>입고 검사 미실시로 불량 관련 공식 문서 없음 확인</td>
+            </tr>
+            <tr>
+                <td>2025-07-22</td>
+                <td style="color:#666;font-size:13px">제1원외탕전_물류</td>
+                <td>녹용경옥고 5열 스틱포롤 <strong>안전재고 8개 제외 전량 반품</strong> (재작업 의뢰, 경동택배 착불)</td>
+            </tr>
+            <tr>
+                <td>2025-08-04</td>
+                <td style="color:#666;font-size:13px">부자재-구매협력</td>
+                <td>ASPT 교환 요청분 택배 발송 확인</td>
+            </tr>
+            <tr>
+                <td>2025-08-19</td>
+                <td style="color:#666;font-size:13px">산청manu_업무공유</td>
+                <td>다이어트 스틱포롤 현장 22개 남음 (목요일까지만 사용 가능) → 긴급 선입고 요청</td>
+            </tr>
+            <tr>
+                <td>2025-08-21</td>
+                <td style="color:#666;font-size:13px">제2원외탕전_트러블슈팅</td>
+                <td>스틱포롤 <strong>컷팅 꼬투리 잔류</strong> — 아이마크 영역이 그만큼 줄어 불량 가능성 증가, 제작업체 컴플레인 예정</td>
+            </tr>
+            <tr>
+                <td>2025-08-28</td>
+                <td style="color:#666;font-size:13px">산청manu_업무공유</td>
+                <td>재작업 롤(단차·감김 불량 처리분)에서 <strong>얼룩자국 간헐적 발견</strong>. 다이어트 96개 입고 중 2개가 <strong>450m (정규 500m 미달)</strong></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 2025년 10~11월 -->
+<div class="card">
+    <h3>2025년 10~11월 <span class="period-badge">누액 이슈 및 구조적 문제 제기</span></h3>
+    <table>
+        <thead>
+            <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="white-space:nowrap">2025-10-13</td>
+                <td style="color:#666;font-size:13px">품질논의</td>
+                <td>스틱포장기 최적 세팅값 탐색 + <strong>더 두껍고 접착력 좋은 재질 조사</strong> 필요성 논의</td>
+            </tr>
+            <tr>
+                <td>2025-11-07</td>
+                <td style="color:#666;font-size:13px">office_행정총무</td>
+                <td><strong>잔량 롤 문제 공식 제기</strong> — 불량 구간 제거 후 잔량 롤 발생(예: 245m), 이어붙인 구간 통과 시 스틱 불량(파손·눌림) 필연 발생 → 비용 협의 필요</td>
+            </tr>
+            <tr>
+                <td>2025-11-20</td>
+                <td style="color:#666;font-size:13px">제2원외탕전_품의</td>
+                <td>ASPT에서 <strong>투명무지롤 제공 → 누액 원인 분석</strong> 예정. 소마팩(기계업체)과 협력하여 기계 점검 병행</td>
+            </tr>
+            <tr>
+                <td>2025-11-27</td>
+                <td style="color:#666;font-size:13px">산청2호점-cs</td>
+                <td>은교산 스틱 접착 불량 — 10/29 이후 개선 시도 중. <strong>롤밀기 이용 2차 검수(접착불량 선별)</strong> 도입 예정, 출고 후 불량 발견 건 1/10 수준 감소 기대</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 2026년 2~3월 -->
+<div class="card">
+    <h3>2026년 2~3월 <span class="period-badge">불량 재증가 및 현장 방문</span></h3>
+    <table>
+        <thead>
+            <tr><th>날짜</th><th>채널</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="white-space:nowrap">2026-02-06</td>
+                <td style="color:#666;font-size:13px">제2원외탕전_트러블슈팅</td>
+                <td>인팩 5열 <strong>커팅 불량</strong> — 스틱 꼬리가 매끄럽지 않음</td>
+            </tr>
+            <tr>
+                <td>2026-02-20</td>
+                <td style="color:#666;font-size:13px">산청manu_업무공유</td>
+                <td>ASPT 방문 전 불량 브리핑 내용 정리 (곽창원)</td>
+            </tr>
+            <tr>
+                <td>2026-02-27</td>
+                <td style="color:#666;font-size:13px">생산관리_컨설팅</td>
+                <td>
+                    <strong>ASPT 현장 방문 미팅</strong> (도지미 이사, 김진덕 본부장 대응) — 논의 결과:<br>
+                    ▸ <strong>린 스틱포 롤</strong>: 내면 우글거림(교환), 바깥면 사선(합지 불량·개선요청), 분진(LOT별 추적 필요), 컷팅 꼬리(ASPT 측 불량 인정 거부), 아이마크 편차(교환)<br>
+                    ▸ <strong>경옥고·총명공진단</strong>: 인쇄 이물 불량 → 교환 진행<br>
+                    ▸ <strong>사탕포장지</strong>: 가이드선 컷팅 실패로 검은 라인 발생 → 교환 진행<br>
+                    ▸ <strong>총명공진단 스틱포 롤</strong>: 단층 발생 (롤 감김 저항 낮아 내부 빠져나옴) → 교환
+                </td>
+            </tr>
+            <tr>
+                <td>2026-03-03</td>
+                <td style="color:#666;font-size:13px">제2원외탕전_트러블슈팅</td>
+                <td>불량 이슈 보고 증가 → <strong>ASPT 불량 전용 스레드 신설</strong></td>
+            </tr>
+            <tr>
+                <td style="white-space:nowrap">2026-03-03</td>
+                <td style="color:#666;font-size:13px">제2원외탕전_트러블슈팅</td>
+                <td>인팩5열 롤지 불량 다수 발생 — 새 롤지 교체 후 다시 롤지 교체 반복. <strong>긴급 처리된 대량 입고분에서 불량 집중 발생</strong>, 불량 롤 외부 반출 후 업체 교체 예정</td>
+            </tr>
+            <tr>
+                <td>2026-03-04</td>
+                <td style="color:#666;font-size:13px">제2원외탕전_트러블슈팅</td>
+                <td>
+                    <strong>롤지 사이드 컬링 현상으로 마킹기 걸림</strong> — 롤지 교체 후 컬링으로 마킹기가 이동하며 쓸리는 현상 발생. 롤지 불량으로 교체 후 작업 재개. 업체 발주 시 교환 예정.<br>
+                    ▸ ASPT 품질담당자 소통 중: <strong>필름 텐션을 올려서 작업해도 동일한지</strong> 확인 요청 중<br>
+                    ▸ 최근 입고된 5열 롤지에서 지속 발생 — 불량 롤 수량 파악 중
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 대응 현황 요약 -->
+<div class="section-title">3. 대응 현황 요약</div>
+<div class="card">
+    <table>
+        <thead>
+            <tr><th>대응 방식</th><th>내용</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="white-space:nowrap"><strong>반품·재작업</strong></td>
+                <td>2025년 4월, 7월 대규모 반품 진행. 단, ASPT가 재작업 없이 그대로 재납품하는 사례 발생</td>
+            </tr>
+            <tr>
+                <td style="white-space:nowrap"><strong>현장 방문</strong></td>
+                <td>2026-02-27 ASPT 공장 방문 미팅. 불량 유형별 원인 설명 청취 및 교환·개선 요청</td>
+            </tr>
+            <tr>
+                <td style="white-space:nowrap"><strong>업체 변경 요청</strong></td>
+                <td>2025-07-11 공식 변경 요청 → 현재(2026-03)까지 ASPT와 거래 지속 중</td>
+            </tr>
+            <tr>
+                <td style="white-space:nowrap"><strong>내부 검수 강화</strong></td>
+                <td>롤밀기 2차 검수 도입 예정 (접착 불량 선별), 입고 검사 체계 미비 상태</td>
+            </tr>
+            <tr>
+                <td style="white-space:nowrap"><strong>소재 분석</strong></td>
+                <td>ASPT 제공 투명무지롤로 누액 원인 분석 중 (소마팩 협력)</td>
+            </tr>
+            <tr>
+                <td style="white-space:nowrap"><strong>비용 협의</strong></td>
+                <td>잔량 롤·불량 롤에 대한 비용 차감/협의 일부 진행, 전면 합의는 미완</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 특이사항 -->
+<div class="section-title">4. 특이사항</div>
+<div class="card">
+    <ul class="special-items">
+        <li>
+            <span class="num-circle">1</span>
+            <strong>ASPT 외주 제작 문제</strong>: ASPT가 자체 생산이 아닌 외주 제작으로 납품 중임이 확인됨. 전체 검수가 이루어지지 않고 있어 품질 일관성 보장 불가.
+        </li>
+        <li>
+            <span class="num-circle">2</span>
+            <strong>재작업 미이행</strong>: 2025년 4월, 불량 반품 후 재작업 없이 불량 표기 그대로 재납품한 사실 확인됨.
+        </li>
+        <li>
+            <span class="num-circle">3</span>
+            <strong>재질 변경 이력</strong>: 2025년 3월, PP 재질에서 PE 재질로 변경. PE는 내열 105도로 고온 살균(끓는 물) 불가, 겨울 생산품 품질 편차 큼.
+        </li>
+        <li>
+            <span class="num-circle">4</span>
+            <strong>롤 보관 주의사항</strong>: 최대 <strong>6개월 이내</strong> 사용 권장. 장기 보관 시 유분 발생, 롤 감김 저항 저하로 내부 빠짐 현상 발생 가능.
+        </li>
+        <li>
+            <span class="num-circle">5</span>
+            <strong>입고 검사 체계 부재</strong>: 스틱포 롤은 입고 검사 미실시. 불량 문서 기록 없음 (2025-07-15 확인). 체계 수립 필요.
+        </li>
+        <li>
+            <span class="num-circle">6</span>
+            <strong>업체 변경 미진행</strong>: 2025년 7월 공식 변경 요청 이후에도 대안 업체 미확정 상태로 ASPT 거래 지속 중.
+        </li>
+    </ul>
+</div>
+
+<div class="footer">문서 기준일: 2026-03-04 &nbsp;|&nbsp; 슬랙 메시지 기반 수집 및 분석</div>
 
 </body>
 </html>
